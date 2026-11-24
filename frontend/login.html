@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="theme-color" content="#05070d">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="apple-touch-icon" href="/static/favicon.svg">
+    <title>CyberMind AI | Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="auth-shell">
+
+        <aside class="auth-art">
+            <a class="auth-logo" href="/"><img src="/static/favicon.svg" width="34" height="34" alt="">CyberMind <span class="logo-ai">AI</span></a>
+            <div>
+                <h2>Welcome back to your security desk.</h2>
+                <p>Your latest events and AI predictions are waiting on the dashboard.</p>
+            </div>
+            <ul>
+                <li>Every log classified automatically</li>
+                <li>Confidence score on each prediction</li>
+                <li>One dashboard for all events</li>
+            </ul>
+        </aside>
+
+        <section class="auth-panel">
+            <main class="auth-container">
+                <a class="auth-logo" href="/"><img src="/static/favicon.svg" width="34" height="34" alt="">CyberMind <span class="logo-ai">AI</span></a>
+                <h1>Log in</h1>
+                <p class="auth-sub">Enter your details to open the dashboard.</p>
+
+                <form id="loginForm">
+                    <div class="field">
+                        <label for="email">Email address</label>
+                        <input type="email" id="email" placeholder="you@company.com"
+                               autocomplete="email" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Your password"
+                               autocomplete="current-password" required>
+                    </div>
+
+                    <button type="submit">Log in</button>
+                </form>
+
+                <p id="message" role="status" aria-live="polite"></p>
+
+                <p class="auth-switch">New here? <a href="/signup">Create an account</a></p>
+            </main>
+        </section>
+    </div>
+
+    <script src="/static/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+pydantic
+fastapi
+uvicorn
+psycopg[binary]
+python-dotenv
+httpx
+pwdlib[argon2]
+scikit-learn
+joblib
+python-multipart
+pypdf
+python-docx
+pandas

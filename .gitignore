@@ -1,0 +1,29 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.log
+.pytest_cache/
+
+# Uploaded user files
+uploads/*
+!uploads/.gitkeep
+# Application uploads
+app/uploads/*
+!app/uploads/.gitkeep
+
+# Local database and generated files
+*.sqlite3
+*.db

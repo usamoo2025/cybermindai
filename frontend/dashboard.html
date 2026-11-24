@@ -1,0 +1,867 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="CyberMind AI - Local Cybersecurity Intelligence Platform">
+
+    <meta name="theme-color" content="#05070d">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <title>CyberMind AI | Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/dashboard.css">
+</head>
+
+<body>
+
+<div class="app-layout">
+
+    <!-- =================================
+         SIDEBAR
+    ================================== -->
+
+    <aside class="sidebar">
+
+        <div class="brand"><img src="/static/favicon.svg" width="38" height="38" alt="">
+            <h2>CyberMind <span>AI</span></h2>
+            <small>INTELLIGENCE PLATFORM</small>
+        </div>
+
+        <p class="sidebar-label">WORKSPACE</p>
+
+        <nav>
+
+            <a href="#overview" class="active">
+                <span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span> Overview
+            </a>
+
+            <a href="#assistant">
+                <span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span> AI Assistant
+            </a>
+
+            <a href="#report">
+                <span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg></span> AI Chat Report
+            </a>
+
+            <a href="#uploads">
+                <span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg></span> File Intelligence
+            </a>
+
+            <a href="#security-logs">
+                <span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg></span> Security Logs
+            </a>
+
+            <a href="#history">
+                <span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span> Analysis History
+            </a>
+
+            <a href="/docs" target="_blank" rel="noopener noreferrer">
+                <span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8 4 12l4 4M16 8l4 4-4 4M14 5l-4 14"/></svg></span> API Documentation
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <div class="local-ai-card">
+
+                <span class="status-indicator"></span>
+
+                <div>
+                    <strong>Local AI Engine</strong>
+                    <small>Llama 3.2:1B</small>
+                </div>
+
+            </div>
+
+
+            <div class="user-profile">
+
+                <div class="user-avatar">U</div>
+
+                <div>
+                    <strong id="welcomeUser">My account</strong>
+                    <small>Authenticated user</small>
+                </div>
+
+                <button
+                    id="logoutBtn"
+                    type="button"
+                    title="Logout">
+                    ⇥
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =================================
+         MAIN CONTENT
+    ================================== -->
+
+    <main class="main-content">
+
+
+        <!-- HEADER -->
+
+        <header class="top-header">
+
+            <div>
+
+                <p class="breadcrumb">
+                    CYBERMIND / WORKSPACE
+                </p>
+
+                <h1>Cybersecurity Intelligence</h1>
+
+                <p>
+                    Your unified local AI security workspace.
+                </p>
+
+            </div>
+
+
+            <div class="system-status">
+
+                <span class="status-indicator"></span>
+
+                Local AI Platform
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================
+             OVERVIEW
+        ================================== -->
+
+        <section id="overview" class="dashboard-section">
+
+            <div class="dash-hero">
+                <div class="dash-hero-text">
+                    <span class="eyebrow">Welcome back</span>
+                    <h2>Smarter Security. <span>Powered by Intelligence.</span></h2>
+                    <p>Ask the AI, scan files and review every security event from one private workspace.</p>
+                    <div class="hero-buttons">
+                        <a href="#assistant" class="primary-button">Ask the AI →</a>
+                        <a href="#uploads" class="secondary-button">Scan a file</a>
+                    </div>
+                </div>
+                <div class="dash-hero-card">
+                    <div class="scanner-header"><span>System status</span><span class="scanner-status"><i class="status-dot"></i> Online</span></div>
+                    <ul class="scan-findings">
+                        <li class="good"><span>✓</span> Local AI engine running</li>
+                        <li class="good"><span>✓</span> Data stays on your machine</li>
+                        <li class="warn"><span>!</span> Vision model coming soon</li>
+                    </ul>
+                    <div class="risk-bar"><div class="risk-fill" style="width:85%"></div></div>
+                    <div class="scanner-footer"><span>Platform health</span><span>85%</span></div>
+                </div>
+            </div>
+
+            <div class="quick-grid">
+                <a href="#assistant" class="quick-card"><strong>AI Assistant</strong><small>Ask security questions</small></a>
+                <a href="#report" class="quick-card"><strong>Chat Report</strong><small>Review your activity</small></a>
+                <a href="#uploads" class="quick-card"><strong>File Intelligence</strong><small>Analyze documents</small></a>
+                <a href="#security-logs" class="quick-card"><strong>Security Logs</strong><small>Classify events</small></a>
+            </div>
+
+            <div class="section-title section-title-sub">
+
+                <h2>Overview</h2>
+
+                <p>
+                    Security monitoring summary.
+                </p>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <article class="stat-card">
+
+                    <h3>Total Security Logs</h3>
+
+                    <p id="totalLogs">0</p>
+
+                </article>
+
+
+                <article class="stat-card">
+
+                    <h3>Phishing Events</h3>
+
+                    <p id="phishingCount">0</p>
+
+                </article>
+
+
+                <article class="stat-card">
+
+                    <h3>Suspicious Logins</h3>
+
+                    <p id="suspiciousCount">0</p>
+
+                </article>
+
+
+                <article class="stat-card">
+
+                    <h3>Benign Events</h3>
+
+                    <p id="benignCount">0</p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             AI ASSISTANT
+        ================================== -->
+
+        <section id="assistant" class="dashboard-section">
+
+            <div class="section-title">
+
+                <h2>AI Assistant</h2>
+
+                <p>
+                    Ask questions and interact with CyberMind AI.
+                </p>
+
+            </div>
+
+
+            <div class="assistant-container">
+
+
+                <!-- ASSISTANT HEADER -->
+
+                <div class="assistant-header">
+
+                    <div class="assistant-avatar">
+                        ✧
+                    </div>
+
+                    <div>
+
+                        <h3>CyberMind Intelligence</h3>
+
+                        <p>Local language model</p>
+
+                    </div>
+
+                </div>
+
+<!-- CHAT HISTORY SIDEBAR -->
+
+<div class="chat-history-panel">
+
+    <div class="chat-history-header">
+        <h3>Conversations</h3>
+
+        <button type="button" id="newChatBtn">
+            + New Chat
+        </button>
+    </div>
+
+    <div id="conversationList">
+        <p>Loading conversations...</p>
+    </div>
+
+</div>
+
+                <!-- CHAT MESSAGES -->
+
+                <div
+                    id="chatMessages"
+                    class="chat-messages">
+
+                    <div class="welcome-message">
+
+                        <h3>Welcome to CyberMind AI</h3>
+
+                        <p>
+                            Ask about cybersecurity, programming,
+                            artificial intelligence, networking,
+                            or other technical subjects.
+
+                            You will also be able to ask questions
+                            about your uploaded documents and images.
+                        </p>
+
+
+                        <div class="suggestion-grid">
+
+                            <button
+                                type="button"
+                                class="suggestion-btn"
+                                data-question="Explain failed login attempts.">
+
+                                Explain failed login attempts
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="suggestion-btn"
+                                data-question="What is SQL injection?">
+
+                                What is SQL injection?
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="suggestion-btn"
+                                data-question="Explain artificial intelligence.">
+
+                                Explain artificial intelligence
+
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="suggestion-btn"
+                                data-question="What is a security log?">
+
+                                Explain security logs
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CHAT ATTACHMENT -->
+
+                <div
+                    id="chatAttachmentPreview"
+                    hidden>
+
+                    <span id="chatAttachmentName"></span>
+
+                    <button
+                        type="button"
+                        id="removeChatAttachment">
+
+                        Remove
+
+                    </button>
+
+                </div>
+
+
+
+                <!-- CHAT INPUT -->
+
+                <form
+                    id="chatForm"
+                    class="chat-input-area">
+
+
+                    <input
+                        type="file"
+                        id="chatFileInput"
+                        accept=".pdf,.txt,.csv,.docx,.png,.jpg,.jpeg,.webp"
+                        hidden
+                    >
+
+
+                    <button
+                        type="button"
+                        id="attachFileBtn"
+                        title="Attach a document or image">
+
+                        +
+
+                    </button>
+
+
+                    <textarea
+                        id="chatInput"
+                        placeholder="Ask CyberMind anything..."
+                        maxlength="5000"
+                        required></textarea>
+
+
+                    <button
+                        type="submit"
+                        id="sendChatBtn"
+                        title="Send message">
+
+                        ↑
+
+                    </button>
+
+                </form>
+
+
+                <p id="chatStatus">
+                    Ready for local AI integration.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             FILE INTELLIGENCE
+        ================================== -->
+
+        <section id="report" class="dashboard-section">
+            <div class="section-title">
+                <h2>AI Chat Report</h2>
+                <p>Summary of your questions to CyberMind AI in this session.</p>
+            </div>
+
+            <div class="stats-grid">
+                <article class="stat-card"><h3>Questions Asked</h3><p id="reportQuestions">0</p></article>
+                <article class="stat-card"><h3>Files Attached</h3><p id="reportFiles">0</p></article>
+                <article class="stat-card"><h3>Security Events</h3><p id="reportEvents">0</p></article>
+                <article class="stat-card"><h3>Phishing Events</h3><p id="reportPhishing">0</p></article>
+            </div>
+
+            <div class="report-card">
+                <div class="report-head">
+                    <h3>Chat activity</h3>
+                    <div class="report-actions">
+                        <button type="button" id="downloadReportBtn">Download report</button>
+                        <button type="button" id="clearReportBtn" class="ghost-btn">Clear</button>
+                    </div>
+                </div>
+                <ol id="reportList" class="report-list">
+                    <li class="report-empty">No chat activity yet. Ask a question in the AI Assistant tab.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- FILE INTELLIGENCE -->
+        <section id="uploads" class="dashboard-section">
+
+            <div class="section-title">
+
+                <h2>File Intelligence</h2>
+
+                <p>
+                    Upload documents and images for AI analysis.
+                </p>
+
+            </div>
+
+
+            <div class="upload-grid">
+
+
+                <!-- DOCUMENT ANALYSIS -->
+
+                <article class="upload-card">
+
+                    <h3>Document Analysis</h3>
+
+                    <p>
+                        Extract and analyze information from
+                        security documents and reports.
+                    </p>
+
+
+                    <label
+                        for="documentInput"
+                        class="upload-dropzone">
+
+                        <span class="upload-symbol">
+                            ↑
+                        </span>
+
+                        <strong>Select Document</strong>
+
+                        <small>
+                            PDF, TXT, CSV, DOCX · Maximum 10 MB
+                        </small>
+
+
+                        <input
+                            type="file"
+                            id="documentInput"
+                            accept=".pdf,.txt,.csv,.docx"
+                            hidden
+                        >
+
+                    </label>
+
+
+
+                    <div id="documentFileInfo" hidden>
+
+                        <span id="documentFileName"></span>
+
+                        <button
+                            type="button"
+                            id="removeDocument">
+
+                            Remove
+
+                        </button>
+
+                    </div>
+
+
+
+                    <button
+                        type="button"
+                        id="analyzeDocumentBtn"
+                        disabled>
+
+                        Analyze Document
+
+                    </button>
+
+
+                    <p id="documentStatus"></p>
+
+                </article>
+
+
+
+                <!-- IMAGE ANALYSIS -->
+
+                <article class="upload-card">
+
+                    <h3>Image Intelligence</h3>
+
+                    <p>
+                        Select screenshots, diagrams, and
+                        security-related images.
+                    </p>
+
+
+                    <label
+                        for="imageInput"
+                        class="upload-dropzone">
+
+                        <span class="upload-symbol">
+                            ▧
+                        </span>
+
+                        <strong>Select Image</strong>
+
+                        <small>
+                            PNG, JPG, JPEG, WEBP · Maximum 10 MB
+                        </small>
+
+
+                        <input
+                            type="file"
+                            id="imageInput"
+                            accept=".png,.jpg,.jpeg,.webp"
+                            hidden
+                        >
+
+                    </label>
+
+
+
+                    <div
+                        id="imagePreviewContainer"
+                        hidden>
+
+                        <img
+                            id="imagePreview"
+                            alt="Selected image preview"
+                        >
+
+                        <button
+                            type="button"
+                            id="removeImage">
+
+                            Remove
+
+                        </button>
+
+                    </div>
+
+
+
+                    <button
+                        type="button"
+                        id="analyzeImageBtn"
+                        disabled>
+
+                        Analyze Image
+
+                    </button>
+
+
+                    <p id="imageStatus">
+                        Select an image to preview.
+                    </p>
+
+                </article>
+
+            </div>
+
+
+
+            <!-- =================================
+                 ANALYSIS RESULTS
+            ================================== -->
+
+            <div
+                id="uploadAnalysisOutput"
+                hidden>
+
+                <h3 id="uploadAnalysisTitle">
+                    Analysis Results
+                </h3>
+
+                <div id="uploadAnalysisContent"></div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             SECURITY EVENT MANAGEMENT
+        ================================== -->
+
+        <section
+            id="security-logs"
+            class="dashboard-section">
+
+
+            <div class="section-title">
+
+                <h2>Security Event Management</h2>
+
+                <p>
+                    Create and classify security events.
+                </p>
+
+            </div>
+
+
+
+            <!-- CREATE EVENT FORM -->
+
+            <div class="event-form-card">
+
+                <form id="securityLogForm">
+
+
+                    <label for="eventType">
+                        Event Type
+                    </label>
+
+                    <input
+                        type="text"
+                        id="eventType"
+                        placeholder="Authentication Failure"
+                        maxlength="100"
+                        required
+                    >
+
+
+
+                    <label for="eventSeverity">
+                        Severity
+                    </label>
+
+                    <select
+                        id="eventSeverity"
+                        required>
+
+                        <option value="">
+                            Select severity
+                        </option>
+
+                        <option value="Low">
+                            Low
+                        </option>
+
+                        <option value="Medium">
+                            Medium
+                        </option>
+
+                        <option value="High">
+                            High
+                        </option>
+
+                        <option value="Critical">
+                            Critical
+                        </option>
+
+                    </select>
+
+
+
+                    <label for="eventDescription">
+                        Description
+                    </label>
+
+                    <textarea
+                        id="eventDescription"
+                        placeholder="Describe the security event..."
+                        maxlength="5000"
+                        required></textarea>
+
+
+
+                    <button
+                        type="submit"
+                        id="saveLogBtn">
+
+                        Save Security Event
+
+                    </button>
+
+
+                    <p id="logFormStatus"></p>
+
+                </form>
+
+            </div>
+
+
+
+            <!-- SECURITY LOG TABLE -->
+
+            <div class="logs-section">
+
+                <h3>Recent Security Events</h3>
+
+                <p id="statusMessage">
+                    Loading security logs...
+                </p>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>ID</th>
+
+                                <th>Event</th>
+
+                                <th>Description</th>
+
+                                <th>Severity</th>
+
+                                <th>AI Prediction</th>
+
+                                <th>Confidence</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="logsTable">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             ANALYSIS HISTORY
+        ================================== -->
+
+        <section
+            id="history"
+            class="dashboard-section">
+
+
+            <div class="section-title">
+
+                <h2>Analysis History</h2>
+
+                <p>
+                    Access your previous document analyses
+                    and generated reports.
+                </p>
+
+            </div>
+
+
+            <div id="analysisHistory">
+
+                <p>
+                    Your analysis history will appear here
+                    once history retrieval is connected.
+                </p>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================
+             FOOTER
+        ================================== -->
+
+        <footer class="dashboard-footer">
+
+            <p>
+                CyberMind AI | Local Cybersecurity Intelligence Platform
+            </p>
+
+        </footer>
+
+
+    </main>
+
+</div>
+
+
+
+<!-- =================================
+     JAVASCRIPT
+================================== -->
+
+<script src="/static/dashboard.js"></script>
+<script src="/static/dashboard-nav.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="CyberMind AI helps you analyze suspicious links, files, images and security events with a private, local AI assistant.">
+    <meta name="theme-color" content="#05070d">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="CyberMind AI | Cybersecurity Intelligence">
+    <meta property="og:description" content="Private, local AI that checks links, messages, files and images and explains the risk in plain language.">
+    <meta name="twitter:card" content="summary">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="apple-touch-icon" href="/static/favicon.svg">
+    <title>CyberMind AI | Cybersecurity Intelligence</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body class="landing">
+    <a class="skip" href="#main" style="position:absolute;left:-999px">Skip to content</a>
+
+    <!-- ============ NAVBAR ============ -->
+    <header class="navbar" id="navbar">
+        <a href="/" class="logo">
+            <img src="/static/favicon.svg" width="34" height="34" alt="">
+            CyberMind <span class="logo-ai">AI</span>
+        </a>
+
+        <nav class="nav-links" id="nav-links" aria-label="Main navigation">
+            <a href="#home">Home</a>
+            <a href="#features">Features</a>
+            <a href="#how">How it works</a>
+            <a href="#about">About</a>
+            <a href="#faq">FAQ</a>
+            <a href="/login" class="nav-login">Login</a>
+        </nav>
+
+        <a href="/signup" class="nav-button">Get started →</a>
+
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <main id="main">
+
+        <!-- ============ HERO ============ -->
+        <section class="hero" id="home">
+
+            <div class="hero-content">
+
+                <div class="status-label">
+                    <span class="status-dot"></span>
+                    Local AI cybersecurity platform
+                </div>
+
+                <h1>
+                    Smarter Security.<br>
+                    <span>Powered by Intelligence.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Paste a suspicious link, message or file and get a clear,
+                    plain-language verdict in seconds. CyberMind AI runs on your
+                    own machine, so your data stays with you.
+                </p>
+                <p class="hero-description hero-extra">
+                    No security background needed. Every result shows a risk score,
+                    the reasons behind it, and the safest next step.
+                </p>
+
+                <div class="hero-buttons">
+                    <a href="/signup" class="primary-button">Start free →</a>
+                    <a href="#features" class="secondary-button">See Features</a>
+                </div>
+
+                <div class="hero-stats">
+                    <div>
+                        <h3>AI</h3>
+                        <p>Powered analysis</p>
+                    </div>
+                    <div>
+                        <h3>24/7</h3>
+                        <p>Local availability</p>
+                    </div>
+                    <div>
+                        <h3>100%</h3>
+                        <p>Privacy focused</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="hero-visual">
+                <div class="scanner-card">
+
+                    <div class="scanner-header">
+                        <span>CyberMind Scanner</span>
+                        <span class="scanner-status"><i class="status-dot"></i> Ready</span>
+                    </div>
+
+                    <div class="scan-target">
+                        <small>Scanning link</small>
+                        <code>http://secure-login-paypa1.com/verify</code>
+                        <div class="scan-sweep"></div>
+                    </div>
+
+                    <ul class="scan-findings">
+                        <li class="bad"><span>✕</span> Look-alike domain ("paypa1")</li>
+                        <li class="bad"><span>✕</span> Domain registered 2 days ago</li>
+                        <li class="warn"><span>!</span> Asks for login details</li>
+                        <li class="good"><span>✓</span> No known malware download</li>
+                    </ul>
+
+                    <div class="risk-meter">
+                        <div class="risk-top">
+                            <span>Risk score</span>
+                            <strong>92 / 100 · High</strong>
+                        </div>
+                        <div class="risk-bar"><div class="risk-fill"></div></div>
+                    </div>
+
+                    <div class="scanner-footer">
+                        <span>Local analysis engine</span>
+                        <span>v1.0</span>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ============ TRUST STRIP ============ -->
+        <section class="trust" aria-label="What CyberMind AI checks">
+            <p>Checks what attackers use most:</p>
+            <ul>
+                <li>Phishing links</li>
+                <li>Scam messages</li>
+                <li>Malicious files</li>
+                <li>Hidden image data</li>
+                <li>Suspicious logins</li>
+            </ul>
+        </section>
+
+        <!-- ============ FEATURES ============ -->
+        <section class="features section" id="features">
+
+            <div class="section-heading">
+                <span class="eyebrow">Our capabilities</span>
+                <h2>One platform. Multiple security tools.</h2>
+                <p>
+                    Each tool explains what it found and why it matters,
+                    so you can decide what to do next. Instead of a wall of
+                    technical output, you get a short answer you can act on.
+                </p>
+            </div>
+
+            <div class="feature-grid">
+
+                <article class="feature-card">
+                    <div class="feature-icon">⌕</div>
+                    <h3>Phishing Detection</h3>
+                    <p>Analyze URLs and messages for look-alike domains, urgent wording and other phishing signs.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">▣</div>
+                    <h3>File Analysis</h3>
+                    <p>Inspect supported files for suspicious structure, risky extensions and hidden behavior.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">▧</div>
+                    <h3>Image Analysis</h3>
+                    <p>Examine image metadata and look for signs of content hidden inside a picture.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">⌘</div>
+                    <h3>Security Intelligence</h3>
+                    <p>Classify security events and review suspicious login activity in one place.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">◔</div>
+                    <h3>Risk Scoring</h3>
+                    <p>Every result comes with a simple score from Low to High, so you know how urgent it is.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">✎</div>
+                    <h3>Plain-Language Reports</h3>
+                    <p>Get short explanations and next-step advice written for people, not only for analysts.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">☰</div>
+                    <h3>Scan History</h3>
+                    <p>Come back to earlier results from your dashboard and compare what changed.</p>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">⛨</div>
+                    <h3>Private by Design</h3>
+                    <p>Analysis runs locally, so the items you check are not sent to outside services.</p>
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- ============ HOW IT WORKS ============ -->
+        <section class="how section" id="how">
+
+            <div class="section-heading">
+                <span class="eyebrow">How it works</span>
+                <h2>From suspicious to understood in three steps.</h2>
+                <p>
+                    You stay in control the whole way. CyberMind AI gives you the
+                    evidence, and you decide what to do with it.
+                </p>
+            </div>
+
+            <ol class="steps">
+                <li>
+                    <span class="step-number">1</span>
+                    <h3>Add what you want to check</h3>
+                    <p>Paste a link or message, or upload a file or image from your dashboard.</p>
+                </li>
+                <li>
+                    <span class="step-number">2</span>
+                    <h3>CyberMind analyzes it</h3>
+                    <p>The local engine looks for known risk patterns and unusual characteristics.</p>
+                </li>
+                <li>
+                    <span class="step-number">3</span>
+                    <h3>Review the verdict</h3>
+                    <p>See the risk score, the reasons behind it, and what you should do next.</p>
+                </li>
+            </ol>
+
+        </section>
+
+        <!-- ============ ABOUT ============ -->
+        <section class="about section" id="about">
+
+            <div class="about-text">
+                <span class="eyebrow">About CyberMind AI</span>
+                <h2>Understand threats. Make informed decisions.</h2>
+                <p>
+                    CyberMind AI combines machine learning, cybersecurity
+                    analysis, and a centralized dashboard to help you
+                    investigate suspicious digital activity without needing
+                    a security background.
+                </p>
+                <p>
+                    It is built for students, small teams and anyone who
+                    wants a second opinion before they click, open or reply.
+                </p>
+                <p>
+                    Security tools are often built for experts and buried in jargon.
+                    CyberMind AI aims to be the opposite: short answers, clear reasons
+                    and no data leaving your machine.
+                </p>
+            </div>
+
+            <div class="about-points">
+                <div>
+                    <h3>Clear</h3>
+                    <p>Results are explained in everyday words.</p>
+                </div>
+                <div>
+                    <h3>Fast</h3>
+                    <p>Most checks finish in a few seconds.</p>
+                </div>
+                <div>
+                    <h3>Private</h3>
+                    <p>Your data stays on your own machine.</p>
+                </div>
+                <div>
+                    <h3>Central</h3>
+                    <p>One dashboard for every tool.</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ============ AUDIENCE ============ -->
+        <section class="audience section" id="audience">
+
+            <div class="section-heading">
+                <span class="eyebrow">Who it's for</span>
+                <h2>Useful whether you're learning or protecting.</h2>
+            </div>
+
+            <div class="audience-grid">
+                <article class="audience-card">
+                    <h3>Students and learners</h3>
+                    <p>See how phishing and malware indicators are spotted, with each finding explained step by step.</p>
+                </article>
+                <article class="audience-card">
+                    <h3>Small teams</h3>
+                    <p>Give everyone a quick way to check a strange email or attachment before it reaches the wider team.</p>
+                </article>
+                <article class="audience-card">
+                    <h3>Everyday users</h3>
+                    <p>Got a text about a missed delivery or a bank alert? Check the link first and reply with confidence.</p>
+                </article>
+            </div>
+
+        </section>
+
+        <!-- ============ FAQ ============ -->
+        <section class="faq section" id="faq">
+
+            <div class="section-heading">
+                <span class="eyebrow">FAQ</span>
+                <h2>Questions people ask first.</h2>
+            </div>
+
+            <div class="faq-list">
+                <details>
+                    <summary>Is my data sent anywhere?</summary>
+                    <p>No. CyberMind AI is a local platform, so the analysis happens on your own machine.</p>
+                </details>
+                <details>
+                    <summary>Do I need security knowledge to use it?</summary>
+                    <p>No. Each result includes a risk score and a plain-language explanation of what was found.</p>
+                </details>
+                <details>
+                    <summary>Can it guarantee something is safe?</summary>
+                    <p>No tool can. A low score means fewer warning signs were found, so keep using good judgment with unknown senders and files.</p>
+                </details>
+                <details>
+                    <summary>What can I analyze?</summary>
+                    <p>URLs, messages, supported files, image metadata and security events such as suspicious logins.</p>
+                </details>
+                <details>
+                    <summary>What should I do if a result says High risk?</summary>
+                    <p>Don't open the link or file, and don't enter any passwords. Delete the message, and if you already interacted with it, change the affected password and tell your IT contact.</p>
+                </details>
+                <details>
+                    <summary>Do I need an account?</summary>
+                    <p>Yes. An account opens your dashboard, where your scans and security events are kept together.</p>
+                </details>
+            </div>
+
+        </section>
+
+        <!-- ============ GET STARTED ============ -->
+        <section class="get-started section" id="get-started">
+            <span class="eyebrow">Get started</span>
+            <h2>Your security analysis starts here.</h2>
+            <p>
+                Create a free account or sign in to open the
+                CyberMind AI dashboard. Sign-up takes less than a minute.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="/signup" class="primary-button">Create Account →</a>
+                <a href="/login" class="secondary-button">Login</a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="site-footer">
+
+        <div class="footer-top">
+
+            <div class="footer-brand">
+                <a href="/" class="logo">
+                    <img src="/static/favicon.svg" width="34" height="34" alt="">
+                    CyberMind <span class="logo-ai">AI</span>
+                </a>
+                <p>Built for intelligent cybersecurity analysis. Clear answers, private by design.</p>
+                <span class="footer-badge"><i class="status-dot"></i> Runs locally on your machine</span>
+            </div>
+
+            <nav class="footer-col" aria-label="Product">
+                <h4>Product</h4>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how">How it works</a></li>
+                    <li><a href="#audience">Who it's for</a></li>
+                </ul>
+            </nav>
+
+            <nav class="footer-col" aria-label="Company">
+                <h4>Learn more</h4>
+                <ul>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="/login">Login</a></li>
+                </ul>
+            </nav>
+
+            <div class="footer-cta">
+                <h4>Ready to check something?</h4>
+                <p>Create an account and run your first scan in minutes.</p>
+                <a href="/signup" class="primary-button">Create Account →</a>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p class="copyright">© <span id="year"></span> CyberMind AI. All rights reserved.</p>
+            <p>No tool is 100% certain. Always use good judgment.</p>
+        </div>
+
+    </footer>
+
+    <script src="/static/script.js"></script>
+
+</body>
+</html>
