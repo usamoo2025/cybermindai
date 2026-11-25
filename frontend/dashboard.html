@@ -7,7 +7,13 @@
     <meta name="theme-color" content="#000000">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <title>CyberMind AI | Dashboard</title>
-    <link rel="stylesheet" href="/static/dashboard.css">
+    <style>
+        /* Safe defaults: page stays black/navy even before dashboard.css loads */
+        html, body { margin: 0; background: #05070c; color: #e8edf6; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+        a { color: inherit; text-decoration: none; }
+        .mobile-bar, .scrim { display: none; }
+    </style>
+    <link rel="stylesheet" href="/static/dashboard.css?v=2">
 </head>
 <body>
 
