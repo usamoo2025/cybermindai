@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // =====================================
-    // ELEMENT REFERENCES AND STATE
+    // 1. ELEMENT REFERENCES AND STATE
     // =====================================
 
     const $ = (id) => document.getElementById(id);
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // API HELPER
+    // 2. API HELPER
     // =====================================
 
     async function apiRequest(url, options = {}) {
@@ -28,13 +28,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         if (response.status === 401 || response.status === 403) {
-            throw new Error("Authentication required. Please log in again.");
+            throw new Error(
+                "Authentication required. Please log in again."
+            );
         }
 
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-            throw new Error(data.detail || "Request failed.");
+            throw new Error(
+                data.detail || "Request failed."
+            );
         }
 
         return data;
@@ -42,12 +46,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // LOGOUT
+    // 3. LOGOUT
     // =====================================
 
     $("logoutBtn").addEventListener("click", async () => {
 
         try {
+
             await apiRequest("/auth/logout", {
                 method: "POST"
             });
@@ -55,47 +60,60 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "/login";
 
         } catch (error) {
+
             alert(error.message);
+
         }
 
     });
 
 
     // =====================================
-    // SECURITY LOGS
+    // 4. SECURITY LOGS
     // =====================================
 
     async function loadSecurityLogs() {
 
-        $("statusMessage").textContent = "Loading security logs...";
+        $("statusMessage").textContent =
+            "Loading security logs...";
 
         try {
 
             const data = await apiRequest("/logs");
             const logs = data.logs || [];
 
-            $("totalLogs").textContent = data.total_logs ?? logs.length;
+            $("totalLogs").textContent =
+                data.total_logs ?? logs.length;
 
             $("phishingCount").textContent =
                 logs.filter(log =>
-                    (log.predicted_category || "").toLowerCase().includes("phishing")
+                    (log.predicted_category || "")
+                        .toLowerCase()
+                        .includes("phishing")
                 ).length;
 
             $("suspiciousCount").textContent =
                 logs.filter(log =>
-                    (log.predicted_category || "").toLowerCase().includes("suspicious")
+                    (log.predicted_category || "")
+                        .toLowerCase()
+                        .includes("suspicious")
                 ).length;
 
             $("benignCount").textContent =
                 logs.filter(log =>
-                    (log.predicted_category || "").toLowerCase().includes("benign")
+                    (log.predicted_category || "")
+                        .toLowerCase()
+                        .includes("benign")
                 ).length;
 
             const table = $("logsTable");
             table.replaceChildren();
 
             if (logs.length === 0) {
-                $("statusMessage").textContent = "No security events recorded.";
+
+                $("statusMessage").textContent =
+                    "No security events recorded.";
+
                 return;
             }
 
@@ -109,15 +127,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     log.description,
                     log.severity,
                     log.predicted_category || "Not classified",
-                    log.confidence !== null && log.confidence !== undefined
+                    log.confidence !== null &&
+                    log.confidence !== undefined
                         ? (log.confidence * 100).toFixed(2) + "%"
                         : "N/A"
                 ];
 
                 values.forEach(value => {
+
                     const cell = document.createElement("td");
+
                     cell.textContent = value;
+
                     row.appendChild(cell);
+
                 });
 
                 table.appendChild(row);
@@ -128,61 +151,80 @@ document.addEventListener("DOMContentLoaded", () => {
                 `Showing ${logs.length} security events.`;
 
         } catch (error) {
-            $("statusMessage").textContent = error.message;
+
+            $("statusMessage").textContent =
+                error.message;
+
         }
 
     }
 
 
     // =====================================
-    // CREATE SECURITY EVENT
+    // 5. CREATE SECURITY EVENT
     // =====================================
 
-    $("securityLogForm").addEventListener("submit", async (event) => {
+    $("securityLogForm").addEventListener(
+        "submit",
+        async (event) => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        const button = $("saveLogBtn");
+            const button = $("saveLogBtn");
 
-        const payload = {
-            event_type: $("eventType").value.trim(),
-            severity: $("eventSeverity").value,
-            description: $("eventDescription").value.trim()
-        };
+            const payload = {
+                event_type: $("eventType").value.trim(),
+                severity: $("eventSeverity").value,
+                description: $("eventDescription").value.trim()
+            };
 
-        button.disabled = true;
-        button.textContent = "Saving...";
+            button.disabled = true;
+            button.textContent = "Saving...";
 
-        try {
+            try {
 
-            const result = await apiRequest("/logs", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
+                const result = await apiRequest("/logs", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-            $("logFormStatus").textContent = result.message;
+                $("logFormStatus").textContent =
+                    result.message;
 
-            $("securityLogForm").reset();
+                $("securityLogForm").reset();
 
-            await loadSecurityLogs();
+                await loadSecurityLogs();
 
-        } catch (error) {
-            $("logFormStatus").textContent = error.message;
+            } catch (error) {
 
-        } finally {
-            button.disabled = false;
-            button.textContent = "Save Security Event";
+                $("logFormStatus").textContent =
+                    error.message;
+
+            } finally {
+
+                button.disabled = false;
+                button.textContent = "Save Security Event";
+
+            }
+
         }
-
-    });
+    );
 
 
     // =====================================
+    // 6. DOCUMENT PROCESSING
+    // =====================================
+
+    // Allow clicking Analyze even without a file.
+    $("analyzeDocumentBtn").disabled = false;
+
+
+    // -------------------------------------
     // DOCUMENT SELECTION
-    // =====================================
+    // -------------------------------------
 
     $("documentInput").addEventListener("change", () => {
 
@@ -190,100 +232,158 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!file) return;
 
-        const allowed = [".pdf", ".txt", ".csv", ".docx"];
-        const extension = "." + file.name.split(".").pop().toLowerCase();
+        const allowed = [
+            ".pdf",
+            ".txt",
+            ".csv",
+            ".docx"
+        ];
+
+        const extension =
+            "." + file.name.split(".").pop().toLowerCase();
 
         if (!allowed.includes(extension)) {
-            $("documentStatus").textContent = "Unsupported file format.";
+
+            $("documentStatus").textContent =
+                "Unsupported file format. Use PDF, TXT, CSV or DOCX.";
+
             $("documentInput").value = "";
+            selectedDocument = null;
+
             return;
         }
 
-        if (file.size === 0 || file.size > 10 * 1024 * 1024) {
+        if (
+            file.size === 0 ||
+            file.size > 10 * 1024 * 1024
+        ) {
+
             $("documentStatus").textContent =
                 "File must be non-empty and no larger than 10 MB.";
+
             $("documentInput").value = "";
+            selectedDocument = null;
+
             return;
         }
 
         selectedDocument = file;
 
-        $("documentFileName").textContent = file.name;
+        $("documentFileName").textContent =
+            file.name;
+
         $("documentFileInfo").hidden = false;
+
         $("analyzeDocumentBtn").disabled = false;
-        $("documentStatus").textContent = "";
+
+        $("documentStatus").textContent =
+            "Document selected. Ready for analysis.";
 
     });
 
 
-    // =====================================
+    // -------------------------------------
     // REMOVE DOCUMENT
-    // =====================================
+    // -------------------------------------
 
     $("removeDocument").addEventListener("click", () => {
 
         selectedDocument = null;
 
         $("documentInput").value = "";
+
         $("documentFileInfo").hidden = true;
-        $("analyzeDocumentBtn").disabled = true;
 
-        $("documentStatus").textContent = "";
-
-    });
-
-
-    // =====================================
-    // ANALYZE DOCUMENT
-    // =====================================
-
-    $("analyzeDocumentBtn").addEventListener("click", async () => {
-
-        if (!selectedDocument) return;
-
-        const button = $("analyzeDocumentBtn");
-        const formData = new FormData();
-
-        formData.append("file", selectedDocument);
-
-        button.disabled = true;
-        button.textContent = "Analyzing...";
+        $("analyzeDocumentBtn").disabled = false;
 
         $("documentStatus").textContent =
-            "Sending document to local AI...";
-
-        try {
-
-            const result = await apiRequest("/files/analyze", {
-                method: "POST",
-                body: formData
-            });
-
-            $("uploadAnalysisTitle").textContent = result.filename;
-            $("uploadAnalysisContent").textContent = result.analysis;
-            $("uploadAnalysisOutput").hidden = false;
-
-            $("documentStatus").textContent =
-                "Document analyzed successfully.";
-
-            $("uploadAnalysisOutput").scrollIntoView({
-                behavior: "smooth"
-            });
-
-        } catch (error) {
-            $("documentStatus").textContent = error.message;
-
-        } finally {
-            button.disabled = !selectedDocument;
-            button.textContent = "Analyze Document";
-        }
+            "No file attached. Select a document to begin.";
 
     });
 
 
+    // -------------------------------------
+    // ANALYZE DOCUMENT
+    // -------------------------------------
+
+    $("analyzeDocumentBtn").addEventListener(
+        "click",
+        async () => {
+
+            if (!selectedDocument) {
+
+                $("documentStatus").textContent =
+                    "No file attached. Please select a document first.";
+
+                return;
+            }
+
+            const button = $("analyzeDocumentBtn");
+
+            const formData = new FormData();
+
+            formData.append("file", selectedDocument);
+
+            button.disabled = true;
+            button.textContent = "Analyzing...";
+
+            $("documentStatus").textContent =
+                "Sending document to local AI...";
+
+            try {
+
+                const result = await apiRequest(
+                    "/files/analyze",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+                $("uploadAnalysisTitle").textContent =
+                    result.filename || selectedDocument.name;
+
+                $("uploadAnalysisContent").textContent =
+                    result.analysis || "No analysis returned.";
+
+                $("uploadAnalysisOutput").hidden = false;
+
+                $("documentStatus").textContent =
+                    "Document analyzed and indexed successfully.";
+
+                await loadKnowledgeBase();
+
+                $("uploadAnalysisOutput").scrollIntoView({
+                    behavior: "smooth"
+                });
+
+            } catch (error) {
+
+                $("documentStatus").textContent =
+                    error.message;
+
+            } finally {
+
+                button.disabled = false;
+                button.textContent = "Analyze Document";
+
+            }
+
+        }
+    );
+
+
     // =====================================
+    // 7. IMAGE PROCESSING
+    // =====================================
+
+    // Allow clicking Analyze even without an image.
+    $("analyzeImageBtn").disabled = false;
+
+
+    // -------------------------------------
     // IMAGE SELECTION AND PREVIEW
-    // =====================================
+    // -------------------------------------
 
     $("imageInput").addEventListener("change", () => {
 
@@ -298,154 +398,538 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
 
         if (!allowed.includes(file.type)) {
-            $("imageStatus").textContent = "Unsupported image format.";
+
+            $("imageStatus").textContent =
+                "Unsupported image format. Use PNG, JPEG or WEBP.";
+
             $("imageInput").value = "";
+            selectedImage = null;
+
             return;
         }
 
-        if (file.size === 0 || file.size > 10 * 1024 * 1024) {
+        if (
+            file.size === 0 ||
+            file.size > 10 * 1024 * 1024
+        ) {
+
             $("imageStatus").textContent =
                 "Image must be non-empty and no larger than 10 MB.";
+
             $("imageInput").value = "";
+            selectedImage = null;
+
             return;
+        }
+
+        if ($("imagePreview").src.startsWith("blob:")) {
+
+            URL.revokeObjectURL(
+                $("imagePreview").src
+            );
+
         }
 
         selectedImage = file;
 
-        $("imagePreview").src = URL.createObjectURL(file);
+        $("imagePreview").src =
+            URL.createObjectURL(file);
+
         $("imagePreviewContainer").hidden = false;
+
         $("analyzeImageBtn").disabled = false;
 
         $("imageStatus").textContent =
-            "Image selected. Vision AI backend is not connected yet.";
+            "Image selected. Ready for analysis.";
 
     });
 
 
+    // -------------------------------------
+    // REMOVE IMAGE
+    // -------------------------------------
+
     $("removeImage").addEventListener("click", () => {
 
         if ($("imagePreview").src.startsWith("blob:")) {
-            URL.revokeObjectURL($("imagePreview").src);
+
+            URL.revokeObjectURL(
+                $("imagePreview").src
+            );
+
         }
 
         selectedImage = null;
 
         $("imageInput").value = "";
+
         $("imagePreview").removeAttribute("src");
 
         $("imagePreviewContainer").hidden = true;
-        $("analyzeImageBtn").disabled = true;
+
+        $("analyzeImageBtn").disabled = false;
 
         $("imageStatus").textContent =
-            "Select an image to preview.";
+            "No image attached. Select an image to begin.";
 
     });
 
 
-    $("analyzeImageBtn").addEventListener("click", () => {
+    // -------------------------------------
+    // IMAGE ANALYSIS
+    // -------------------------------------
 
-        $("imageStatus").textContent =
-            "Image preview works. Local vision model integration is our next development stage.";
+    $("analyzeImageBtn").addEventListener(
+        "click",
+        async () => {
 
-    });
+            if (!selectedImage) {
+
+                $("imageStatus").textContent =
+                    "No image attached. Please select an image first.";
+
+                return;
+            }
+
+            // Image preview is implemented.
+            // A vision model and backend endpoint are
+            // not connected yet.
+
+            $("imageStatus").textContent =
+                "Image selected successfully. AI image analysis is not available yet because a vision model has not been configured.";
+
+        }
+    );
 
 
     // =====================================
-    // CHAT ATTACHMENT SELECTION
+    // 8. KNOWLEDGE BASE MANAGEMENT
     // =====================================
+
+    async function loadKnowledgeBase() {
+
+        const list = $("knowledgeBaseList");
+
+        const status = $("knowledgeBaseStatus");
+
+        const refreshButton =
+            $("refreshKnowledgeBaseBtn");
+
+        if (!list || !status) return;
+
+        status.textContent =
+            "Loading documents...";
+
+        list.replaceChildren();
+
+        if (refreshButton) {
+            refreshButton.disabled = true;
+        }
+
+        try {
+
+            const data = await apiRequest(
+                "/files/knowledge-base"
+            );
+
+            const documents = data.documents || [];
+
+            if (documents.length === 0) {
+
+                status.textContent =
+                    "Your Knowledge Base is empty.";
+
+                const empty = document.createElement("p");
+
+                empty.textContent =
+                    "Upload a document to get started.";
+
+                list.appendChild(empty);
+
+                return;
+            }
+
+            status.textContent =
+                `${documents.length} document(s) stored.`;
+
+            documents.forEach(document => {
+
+                const card = document.createElement("div");
+
+                card.className =
+                    "knowledge-base-item";
+
+                const details =
+                    document.createElement("div");
+
+                const name =
+                    document.createElement("h3");
+
+                name.textContent =
+                    document.filename;
+
+                const metadata =
+                    document.createElement("p");
+
+                const sizeMB =
+                    (
+                        document.file_size /
+                        (1024 * 1024)
+                    ).toFixed(2);
+
+                metadata.textContent =
+                    `${sizeMB} MB | ${document.chunks} chunks | ${document.status}`;
+
+                details.appendChild(name);
+
+                details.appendChild(metadata);
+
+                const deleteButton =
+                    document.createElement("button");
+
+                deleteButton.type = "button";
+
+                deleteButton.textContent = "Delete";
+
+                deleteButton.className = "ghost-btn";
+
+                deleteButton.addEventListener(
+                    "click",
+                    async () => {
+
+                        const confirmed = window.confirm(
+                            `Delete "${document.filename}" from your Knowledge Base?`
+                        );
+
+                        if (!confirmed) return;
+
+                        deleteButton.disabled = true;
+
+                        deleteButton.textContent =
+                            "Deleting...";
+
+                        try {
+
+                            await apiRequest(
+                                `/files/knowledge-base/${document.id}`,
+                                {
+                                    method: "DELETE"
+                                }
+                            );
+
+                            await loadKnowledgeBase();
+
+                        } catch (error) {
+
+                            status.textContent =
+                                error.message;
+
+                            deleteButton.disabled = false;
+
+                            deleteButton.textContent =
+                                "Delete";
+
+                        }
+
+                    }
+                );
+
+                card.appendChild(details);
+
+                card.appendChild(deleteButton);
+
+                list.appendChild(card);
+
+            });
+
+        } catch (error) {
+
+            status.textContent =
+                error.message;
+
+        } finally {
+
+            if (refreshButton) {
+                refreshButton.disabled = false;
+            }
+
+        }
+
+    }
+
+
+    // -------------------------------------
+    // REFRESH KNOWLEDGE BASE
+    // -------------------------------------
+
+    $("refreshKnowledgeBaseBtn").addEventListener(
+        "click",
+        loadKnowledgeBase
+    );
+
+
+    // =====================================
+    // 9. CHAT ATTACHMENT MANAGEMENT
+    // =====================================
+
+    // -------------------------------------
+    // OPEN FILE SELECTOR
+    // -------------------------------------
 
     $("attachFileBtn").addEventListener("click", () => {
+
         $("chatFileInput").click();
+
     });
 
+
+    // -------------------------------------
+    // CHAT ATTACHMENT SELECTION
+    // -------------------------------------
 
     $("chatFileInput").addEventListener("change", () => {
 
-        chatAttachment = $("chatFileInput").files[0];
+        chatAttachment =
+            $("chatFileInput").files[0];
 
         if (!chatAttachment) return;
 
-        $("chatAttachmentName").textContent = chatAttachment.name;
+        const allowed = [
+            ".pdf",
+            ".txt",
+            ".csv",
+            ".docx"
+        ];
+
+        const extension =
+            "." + chatAttachment.name.split(".").pop().toLowerCase();
+
+        if (!allowed.includes(extension)) {
+
+            $("chatStatus").textContent =
+                "Only PDF, TXT, CSV and DOCX files are supported.";
+
+            clearChatAttachment();
+
+            return;
+        }
+
+        if (
+            chatAttachment.size === 0 ||
+            chatAttachment.size > 10 * 1024 * 1024
+        ) {
+
+            $("chatStatus").textContent =
+                "File must be non-empty and no larger than 10 MB.";
+
+            clearChatAttachment();
+
+            return;
+        }
+
+        $("chatAttachmentName").textContent =
+            chatAttachment.name;
+
         $("chatAttachmentPreview").hidden = false;
 
         $("chatStatus").textContent =
-            "Attachments are not connected to chat yet. Remove the attachment to send a message.";
+            "File attached. Enter your question and send.";
 
     });
 
 
-    $("removeChatAttachment").addEventListener("click", () => {
+    // -------------------------------------
+    // CLEAR CHAT ATTACHMENT
+    // -------------------------------------
+
+    function clearChatAttachment() {
 
         chatAttachment = null;
 
         $("chatFileInput").value = "";
+
         $("chatAttachmentPreview").hidden = true;
 
-        $("chatStatus").textContent = "";
-
-    });
-
-
-    // =====================================
-    // CHAT MESSAGE RENDERING
-    // =====================================
-
-    function renderMessage(role, content) {
-
-        const message = document.createElement("div");
-
-        message.className = `chat-message ${role}`;
-
-        const messageContent = document.createElement("div");
-
-        messageContent.className = "message-content";
-        messageContent.textContent = content;
-
-        message.appendChild(messageContent);
-        chatMessages.appendChild(message);
-
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+        $("chatAttachmentName").textContent = "";
 
     }
 
 
+    // -------------------------------------
+    // REMOVE CHAT ATTACHMENT
+    // -------------------------------------
+
+    $("removeChatAttachment").addEventListener(
+        "click",
+        () => {
+
+            clearChatAttachment();
+
+            $("chatStatus").textContent = "";
+
+        }
+    );
+
+
+    // =====================================
+    // 10. CHAT MESSAGE RENDERING
+    // =====================================
+
+    function renderMessage(role, content, sources = []) {
+
+        const message =
+            document.createElement("div");
+
+        message.className =
+            `chat-message ${role}`;
+
+        const messageContent =
+            document.createElement("div");
+
+        messageContent.className =
+            "message-content";
+
+        // textContent prevents uploaded or AI-generated
+        // content from being interpreted as HTML.
+        messageContent.textContent =
+            content;
+
+        message.appendChild(messageContent);
+
+
+        // ---------------------------------
+        // RAG SOURCE ATTRIBUTION
+        // ---------------------------------
+
+        if (
+            role === "assistant" &&
+            Array.isArray(sources) &&
+            sources.length > 0
+        ) {
+
+            const sourceContainer =
+                document.createElement("div");
+
+            sourceContainer.className =
+                "message-sources";
+
+            const sourceHeading =
+                document.createElement("h4");
+
+            sourceHeading.textContent =
+                `Sources (${sources.length})`;
+
+            sourceContainer.appendChild(
+                sourceHeading
+            );
+
+            sources.forEach(source => {
+
+                const sourceCard =
+                    document.createElement("div");
+
+                sourceCard.className =
+                    "message-source-card";
+
+                const filename =
+                    document.createElement("p");
+
+                filename.className =
+                    "message-source-filename";
+
+                filename.textContent =
+                    source.filename || "Unknown document";
+
+                const chunkInfo =
+                    document.createElement("p");
+
+                chunkInfo.className =
+                    "message-source-chunk";
+
+                const chunkNumber =
+                    Number.isInteger(source.chunk_index)
+                        ? source.chunk_index + 1
+                        : null;
+
+                chunkInfo.textContent =
+                    chunkNumber !== null
+                        ? `Chunk ${chunkNumber}`
+                        : "Chunk information unavailable";
+
+                sourceCard.appendChild(filename);
+
+                sourceCard.appendChild(chunkInfo);
+
+                sourceContainer.appendChild(sourceCard);
+
+            });
+
+            message.appendChild(sourceContainer);
+
+        }
+
+        chatMessages.appendChild(message);
+
+        chatMessages.scrollTop =
+            chatMessages.scrollHeight;
+
+    }
+
+
+    // =====================================
+    // 11. RESET CHAT INTERFACE
+    // =====================================
+
     function resetChatInterface() {
 
-        chatMessages.innerHTML = initialChatMarkup;
+        chatMessages.innerHTML =
+            initialChatMarkup;
 
         currentConversationId = null;
+
+        clearChatAttachment();
 
         updateActiveConversation();
 
         $("chatInput").value = "";
+
         $("chatStatus").textContent = "";
 
     }
 
 
     // =====================================
-    // LOAD CONVERSATION HISTORY
+    // 12. LOAD CONVERSATION HISTORY
     // =====================================
 
     async function loadConversations() {
 
         const list = $("conversationList");
 
-        list.textContent = "Loading conversations...";
+        list.textContent =
+            "Loading conversations...";
 
         try {
 
-            const data = await apiRequest("/chat/conversations");
-            const conversations = data.conversations || [];
+            const data = await apiRequest(
+                "/chat/conversations"
+            );
+
+            const conversations =
+                data.conversations || [];
 
             list.replaceChildren();
 
             if (conversations.length === 0) {
 
-                const empty = document.createElement("p");
+                const empty =
+                    document.createElement("p");
 
-                empty.className = "conversation-empty";
-                empty.textContent = "No conversations yet.";
+                empty.className =
+                    "conversation-empty";
+
+                empty.textContent =
+                    "No conversations yet.";
 
                 list.appendChild(empty);
 
@@ -454,33 +938,64 @@ document.addEventListener("DOMContentLoaded", () => {
 
             conversations.forEach(conversation => {
 
-                const item = document.createElement("div");
+                const item =
+                    document.createElement("div");
 
-                item.className = "conversation-item";
-                item.dataset.id = conversation.id;
+                item.className =
+                    "conversation-item";
 
-                const openButton = document.createElement("button");
+                item.dataset.id =
+                    conversation.id;
+
+                const openButton =
+                    document.createElement("button");
 
                 openButton.type = "button";
-                openButton.className = "conversation-open";
-                openButton.textContent = conversation.title || "New Conversation";
 
-                openButton.addEventListener("click", () => {
-                    openConversation(conversation.id);
-                });
+                openButton.className =
+                    "conversation-open";
 
-                const deleteButton = document.createElement("button");
+                openButton.textContent =
+                    conversation.title || "New Conversation";
+
+                openButton.addEventListener(
+                    "click",
+                    () => {
+
+                        openConversation(
+                            conversation.id
+                        );
+
+                    }
+                );
+
+                const deleteButton =
+                    document.createElement("button");
 
                 deleteButton.type = "button";
-                deleteButton.className = "conversation-delete";
-                deleteButton.textContent = "Delete";
-                deleteButton.title = "Delete conversation";
 
-                deleteButton.addEventListener("click", () => {
-                    deleteConversation(conversation.id);
-                });
+                deleteButton.className =
+                    "conversation-delete";
+
+                deleteButton.textContent =
+                    "Delete";
+
+                deleteButton.title =
+                    "Delete conversation";
+
+                deleteButton.addEventListener(
+                    "click",
+                    () => {
+
+                        deleteConversation(
+                            conversation.id
+                        );
+
+                    }
+                );
 
                 item.appendChild(openButton);
+
                 item.appendChild(deleteButton);
 
                 list.appendChild(item);
@@ -491,7 +1006,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            list.textContent = error.message;
+            list.textContent =
+                error.message;
 
         }
 
@@ -499,17 +1015,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // ACTIVE CONVERSATION HIGHLIGHT
+    // 13. ACTIVE CONVERSATION HIGHLIGHT
     // =====================================
 
     function updateActiveConversation() {
 
-        document.querySelectorAll(".conversation-item").forEach(item => {
+        document.querySelectorAll(
+            ".conversation-item"
+        ).forEach(item => {
 
             item.classList.toggle(
                 "active",
-                Number(item.dataset.id) === Number(currentConversationId)
-                    && currentConversationId !== null
+                Number(item.dataset.id) ===
+                    Number(currentConversationId) &&
+                    currentConversationId !== null
             );
 
         });
@@ -518,12 +1037,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // OPEN PREVIOUS CONVERSATION
+    // 14. OPEN PREVIOUS CONVERSATION
     // =====================================
 
     async function openConversation(conversationId) {
 
-        $("chatStatus").textContent = "Loading conversation...";
+        $("chatStatus").textContent =
+            "Loading conversation...";
 
         try {
 
@@ -533,15 +1053,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
             chatMessages.replaceChildren();
 
-            currentConversationId = conversationId;
+            clearChatAttachment();
 
-            const messages = data.messages || [];
+            currentConversationId =
+                conversationId;
+
+            const messages =
+                data.messages || [];
 
             messages.forEach(message => {
 
                 renderMessage(
                     message.role,
-                    message.content
+                    message.content,
+                    message.sources || []
                 );
 
             });
@@ -552,7 +1077,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            $("chatStatus").textContent = error.message;
+            $("chatStatus").textContent =
+                error.message;
 
         }
 
@@ -560,7 +1086,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // CREATE NEW CHAT
+    // 15. CREATE NEW CHAT
     // =====================================
 
     $("newChatBtn").addEventListener("click", () => {
@@ -573,7 +1099,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // DELETE CONVERSATION
+    // 16. DELETE CONVERSATION
     // =====================================
 
     async function deleteConversation(conversationId) {
@@ -593,8 +1119,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             );
 
-            if (Number(currentConversationId) === Number(conversationId)) {
+            if (
+                Number(currentConversationId) ===
+                Number(conversationId)
+            ) {
+
                 resetChatInterface();
+
             }
 
             await loadConversations();
@@ -604,7 +1135,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         } catch (error) {
 
-            $("chatStatus").textContent = error.message;
+            $("chatStatus").textContent =
+                error.message;
 
         }
 
@@ -612,116 +1144,241 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // CHAT SUGGESTIONS
+    // 17. CHAT SUGGESTIONS
     // =====================================
 
     document.addEventListener("click", (event) => {
 
-        const button = event.target.closest(".suggestion-btn");
+        const button =
+            event.target.closest(".suggestion-btn");
 
         if (!button) return;
 
-        $("chatInput").value = button.dataset.question || "";
+        $("chatInput").value =
+            button.dataset.question || "";
+
         $("chatInput").focus();
 
     });
 
 
     // =====================================
-    // SEND CHAT MESSAGE
+    // 18. ENTER TO SEND
+    // SHIFT + ENTER FOR NEW LINE
     // =====================================
 
-    $("chatForm").addEventListener("submit", async (event) => {
+    $("chatInput").addEventListener(
+        "keydown",
+        (event) => {
 
-        event.preventDefault();
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey &&
+                !event.isComposing
+            ) {
 
-        const question = $("chatInput").value.trim();
+                event.preventDefault();
 
-        if (!question) return;
+                $("chatForm").requestSubmit();
 
-        if (chatAttachment) {
+            }
+
+        }
+    );
+
+
+    // =====================================
+    // 19. SEND CHAT MESSAGE
+    // =====================================
+
+    $("chatForm").addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+            const question =
+                $("chatInput").value.trim();
+
+            if (!question) return;
+
+            const button =
+                $("sendChatBtn");
+
+            button.disabled = true;
 
             $("chatStatus").textContent =
-                "Please remove the attachment. Chat attachment processing is not connected yet.";
-
-            return;
-        }
-
-        const button = $("sendChatBtn");
-
-        button.disabled = true;
-
-        $("chatStatus").textContent = "CyberMind AI is thinking...";
-
-        renderMessage("user", question);
-
-        $("chatInput").value = "";
-
-        try {
-
-            const payload = {
-                message: question,
-                conversation_id: currentConversationId
-            };
-
-            const result = await apiRequest("/chat", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(payload)
-            });
-
-            currentConversationId = result.conversation_id;
-
-            renderMessage("assistant", result.answer);
-
-            $("chatStatus").textContent = "";
-
-            await loadConversations();
-
-        } catch (error) {
+                chatAttachment
+                    ? "Processing attachment and generating answer..."
+                    : "CyberMind AI is thinking...";
 
             renderMessage(
-                "assistant",
-                "Unable to complete your request: " + error.message
+                "user",
+                chatAttachment
+                    ? `[Attachment: ${chatAttachment.name}]\n${question}`
+                    : question
             );
 
-            $("chatStatus").textContent = error.message;
+            $("chatInput").value = "";
 
-        } finally {
+            try {
 
-            button.disabled = false;
-            $("chatInput").focus();
+                let result;
+
+                const wasAttachmentChat =
+                    Boolean(chatAttachment);
+
+
+                // ---------------------------------
+                // CHAT WITH ATTACHMENT
+                // ---------------------------------
+
+                if (wasAttachmentChat) {
+
+                    const formData =
+                        new FormData();
+
+                    formData.append(
+                        "message",
+                        question
+                    );
+
+                    formData.append(
+                        "file",
+                        chatAttachment
+                    );
+
+                    if (currentConversationId !== null) {
+
+                        formData.append(
+                            "conversation_id",
+                            currentConversationId
+                        );
+
+                    }
+
+                    result = await apiRequest(
+                        "/chat/attachment",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+                    clearChatAttachment();
+
+                }
+
+
+                // ---------------------------------
+                // NORMAL CHAT WITH RAG
+                // ---------------------------------
+
+                else {
+
+                    const payload = {
+                        message: question,
+                        conversation_id: currentConversationId
+                    };
+
+                    result = await apiRequest(
+                        "/chat",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify(payload)
+                        }
+                    );
+
+                }
+
+
+                // ---------------------------------
+                // UPDATE CONVERSATION
+                // ---------------------------------
+
+                currentConversationId =
+                    result.conversation_id;
+
+
+                // ---------------------------------
+                // DISPLAY ANSWER AND SOURCES
+                // ---------------------------------
+
+                renderMessage(
+                    "assistant",
+                    result.answer,
+                    wasAttachmentChat
+                        ? []
+                        : (result.sources || [])
+                );
+
+                $("chatStatus").textContent = "";
+
+                await loadConversations();
+
+            } catch (error) {
+
+                renderMessage(
+                    "assistant",
+                    "Unable to complete your request: " +
+                    error.message
+                );
+
+                $("chatStatus").textContent =
+                    error.message;
+
+            } finally {
+
+                button.disabled = false;
+
+                $("chatInput").focus();
+
+            }
 
         }
-
-    });
+    );
 
 
     // =====================================
-    // CURRENT DATE
+    // 20. CURRENT DATE
     // =====================================
 
-    const dateElement = $("currentDate");
+    const dateElement =
+        $("currentDate");
 
     if (dateElement) {
 
         dateElement.textContent =
-            new Date().toLocaleDateString(undefined, {
-                day: "numeric",
-                month: "short",
-                year: "numeric"
-            });
+            new Date().toLocaleDateString(
+                undefined,
+                {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                }
+            );
 
     }
 
 
     // =====================================
-    // INITIALIZE DASHBOARD
+    // 21. INITIALIZE DASHBOARD
     // =====================================
 
+    // Enable both standalone analysis buttons.
+    // Missing attachments are handled by their click handlers.
+
+    $("analyzeDocumentBtn").disabled = false;
+
+    $("analyzeImageBtn").disabled = false;
+
     loadSecurityLogs();
+
     loadConversations();
+
+    loadKnowledgeBase();
 
 });

@@ -11,3 +11,4 @@ python-multipart
 pypdf
 python-docx
 pandas
+pgvector
