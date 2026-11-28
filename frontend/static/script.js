@@ -2,11 +2,13 @@
 document.getElementById("year").textContent = new Date().getFullYear();
 
 // Mobile menu
+const navbar = document.getElementById("navbar");
 const toggle = document.getElementById("menu-toggle");
 const navLinks = document.getElementById("nav-links");
 
 function setMenu(open) {
     navLinks.classList.toggle("open", open);
+    navbar.classList.toggle("open", open);
     toggle.classList.toggle("open", open);
     toggle.setAttribute("aria-expanded", open);
     toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");

@@ -18,18 +18,19 @@ class OllamaClient:
         )
 
         self.timeout = httpx.Timeout(
-            timeout=600.0,
-            connect=10.0,
-            read=600.0,
-            write=600.0,
-            pool=10.0
+            180.0,
+            connect=10.0
+        )
+
+        self.num_threads = int(
+            os.getenv("OLLAMA_NUM_THREADS", "4")
         )
 
     async def chat(
         self,
         messages: list[dict[str, str]],
         temperature: float = 0.2,
-        max_tokens: int = 500
+        max_tokens: int = 350
     ) -> str:
 
         if not messages:
@@ -40,11 +41,12 @@ class OllamaClient:
             "messages": messages,
             "stream": False,
             "think": False,
+            "keep_alive": "5m",
             "options": {
                 "temperature": temperature,
                 "num_predict": max_tokens,
                 "num_ctx": 2048,
-                "num_threads": 8
+                "num_thread": self.num_threads
             }
         }
 
@@ -62,11 +64,13 @@ class OllamaClient:
                 response.raise_for_status()
 
                 data = response.json()
+
                 answer = data.get(
                     "message", {}
                 ).get("content", "").strip()
 
                 if not answer:
+
                     raise RuntimeError(
                         "Ollama returned an empty response."
                     )

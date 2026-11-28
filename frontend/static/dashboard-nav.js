@@ -1,16 +1,33 @@
-// Dashboard tabs (one section visible at a time) + AI chat report
+// Dashboard behaviour: sections, mobile menu, overview bar, chat suggestions, conversation list size
 document.addEventListener("DOMContentLoaded", () => {
     const $ = (id) => document.getElementById(id);
     const sections = [...document.querySelectorAll(".main-content .dashboard-section")];
     const links = [...document.querySelectorAll('.sidebar nav a[href^="#"]')];
     const ids = sections.map(s => s.id);
 
+    // ---- Mobile menu (hamburger button + slide-in sidebar) ----
+    const sidebar = $("sidebar");
+    const scrim = $("scrim");
+    const menuToggle = $("menuToggle");
+
+    function setMenu(open) {
+        sidebar.classList.toggle("open", open);
+        scrim.hidden = !open;
+        menuToggle.setAttribute("aria-expanded", String(open));
+        menuToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    }
+
+    menuToggle.addEventListener("click", () => setMenu(!sidebar.classList.contains("open")));
+    scrim.addEventListener("click", () => setMenu(false));
+    document.addEventListener("keydown", e => { if (e.key === "Escape") setMenu(false); });
+
+    // ---- Sections (one visible at a time) ----
     function show(id) {
         if (!ids.includes(id)) id = ids[0];
         sections.forEach(s => s.classList.toggle("is-active", s.id === id));
         links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + id));
         window.scrollTo({ top: 0 });
-        if (id === "report") refreshReport();
+        setMenu(false);
     }
 
     links.forEach(a => a.addEventListener("click", e => {
@@ -21,64 +38,65 @@ document.addEventListener("DOMContentLoaded", () => {
     }));
     window.addEventListener("hashchange", () => show(location.hash.slice(1)));
 
-    // ---- AI chat report ----
-    const activity = [];
-    const clip = t => t.length > 160 ? t.slice(0, 157) + "…" : t;
+    // ---- Overview: classification split bar and percentages ----
+    const kinds = [
+        ["phishingCount", "splitPhishing", "pctPhishing"],
+        ["suspiciousCount", "splitSuspicious", "pctSuspicious"],
+        ["benignCount", "splitBenign", "pctBenign"]
+    ];
 
-    function refreshReport() {
-        $("reportQuestions").textContent = activity.length;
-        $("reportFiles").textContent = activity.filter(a => a.file).length;
-        $("reportEvents").textContent = $("totalLogs").textContent;
-        $("reportPhishing").textContent = $("phishingCount").textContent;
-        const list = $("reportList");
-        list.replaceChildren();
-        if (!activity.length) {
-            const li = document.createElement("li");
-            li.className = "report-empty";
-            li.textContent = "No chat activity yet. Ask a question in the AI Assistant tab.";
-            list.appendChild(li);
-            return;
-        }
-        activity.forEach(a => {
-            const li = document.createElement("li");
-            const q = document.createElement("strong");
-            q.textContent = clip(a.question);
-            const meta = document.createElement("small");
-            meta.textContent = a.time + (a.file ? " · Attachment: " + a.file : "");
-            li.append(q, meta);
-            list.appendChild(li);
+    function updateSplit() {
+        const total = Number($("totalLogs").textContent) || 0;
+        const counts = kinds.map(k => Number($(k[0]).textContent) || 0);
+        const sum = counts.reduce((a, b) => a + b, 0);
+        kinds.forEach((k, i) => {
+            $(k[1]).style.width = sum ? (counts[i] / sum * 100) + "%" : "0";
+            $(k[2]).textContent = (total ? Math.round(counts[i] / total * 100) : 0) + "% of logs";
         });
     }
 
-    $("chatForm").addEventListener("submit", () => {
-        const question = $("chatInput").value.trim();
-        if (!question) return;
-        const file = $("chatFileInput").files[0];
-        activity.push({ question, file: file ? file.name : "", time: new Date().toLocaleString() });
-        refreshReport();
+    const watcher = new MutationObserver(updateSplit);
+    ["totalLogs", ...kinds.map(k => k[0])].forEach(id =>
+        watcher.observe($(id), { childList: true, characterData: true, subtree: true })
+    );
+    updateSplit();
+
+    // ---- AI Assistant: hide suggestions once a question is started ----
+    const chatBox = $("chatMessages");
+    const chatInput = $("chatInput");
+
+    function syncSuggestions() {
+        const welcome = chatBox.querySelector(".welcome-message");
+        if (!welcome) return;
+        const hasMessages = !!chatBox.querySelector(".chat-message");
+        const typing = chatInput.value.trim() !== "";
+        welcome.hidden = hasMessages;
+        const grid = welcome.querySelector(".suggestion-grid");
+        if (grid) grid.hidden = hasMessages || typing;
+    }
+
+    chatInput.addEventListener("input", syncSuggestions);
+    chatBox.addEventListener("click", () => setTimeout(syncSuggestions, 0));
+    new MutationObserver(syncSuggestions).observe(chatBox, { childList: true });
+    syncSuggestions();
+
+    // ---- Conversations: drag the handle to show more of the list ----
+    const list = $("conversationList");
+    const grip = $("conversationResize");
+    let startY = 0;
+    let startHeight = 0;
+
+    grip.addEventListener("pointerdown", e => {
+        startY = e.clientY;
+        startHeight = list.offsetHeight;
+        grip.setPointerCapture(e.pointerId);
+    });
+    grip.addEventListener("pointermove", e => {
+        if (!grip.hasPointerCapture(e.pointerId)) return;
+        list.style.height = Math.max(72, startHeight + e.clientY - startY) + "px";
     });
 
-    $("clearReportBtn").addEventListener("click", () => { activity.length = 0; refreshReport(); });
-
-    $("downloadReportBtn").addEventListener("click", () => {
-        refreshReport();
-        const lines = [
-            "CyberMind AI - Chat Report",
-            "Generated: " + new Date().toLocaleString(),
-            "",
-            "Questions asked: " + activity.length,
-            "Files attached: " + activity.filter(a => a.file).length,
-            "Security events: " + $("totalLogs").textContent,
-            "Phishing events: " + $("phishingCount").textContent,
-            "",
-            "Chat activity:",
-            ...(activity.length ? activity.map((a, i) => `${i + 1}. [${a.time}] ${a.question}${a.file ? " (file: " + a.file + ")" : ""}`) : ["(none)"])
-        ];
-        const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/plain" }));
-        const a = document.createElement("a");
-        a.href = url; a.download = "cybermind-chat-report.txt"; a.click();
-        URL.revokeObjectURL(url);
-    });
-
-    show(location.hash.slice(1));
+    // ---- Always open on Overview ----
+    history.replaceState(null, "", "#overview");
+    show("overview");
 });

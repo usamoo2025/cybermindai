@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // =====================================
-    // 1. ELEMENT REFERENCES AND STATE
+    // 1. ELEMENTS AND STATE
     // =====================================
 
     const $ = (id) => document.getElementById(id);
@@ -11,6 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let selectedImage = null;
     let chatAttachment = null;
     let currentConversationId = null;
+
+    let sessionHistory = [];
 
     const chatMessages = $("chatMessages");
     const initialChatMarkup = chatMessages.innerHTML;
@@ -37,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!response.ok) {
             throw new Error(
-                data.detail || "Request failed."
+                data.detail || data.message || "Request failed."
             );
         }
 
@@ -46,75 +48,212 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 3. LOGOUT
+    // 3. GENERAL HELPERS
     // =====================================
 
-    $("logoutBtn").addEventListener("click", async () => {
+    function setText(id, value) {
 
-        try {
+        const element = $(id);
 
-            await apiRequest("/auth/logout", {
-                method: "POST"
-            });
-
-            window.location.href = "/login";
-
-        } catch (error) {
-
-            alert(error.message);
-
+        if (element) {
+            element.textContent = value ?? "";
         }
 
-    });
+    }
+
+
+    // First 4 words of a conversation title (full title stays in the tooltip)
+    function shortTitle(title) {
+
+        const words = (title || "New Conversation").trim().split(/\s+/);
+
+        return words.length > 4
+            ? words.slice(0, 4).join(" ") + "…"
+            : words.join(" ");
+
+    }
+
+
+    function createReportBlock(text) {
+
+        const block = document.createElement("pre");
+
+        block.textContent = text || "No report returned.";
+
+        block.style.whiteSpace = "pre-wrap";
+        block.style.overflowWrap = "anywhere";
+
+        return block;
+
+    }
+
+
+    function addHistoryEntry(title, details) {
+
+        const entry = {
+            title,
+            details,
+            date: new Date().toLocaleString()
+        };
+
+        sessionHistory.unshift(entry);
+
+        renderHistory();
+
+    }
+
+
+    function renderHistory() {
+
+        const container = $("analysisHistory");
+
+        if (!container) return;
+
+        container.replaceChildren();
+
+        if (sessionHistory.length === 0) {
+
+            const empty = document.createElement("p");
+
+            empty.textContent =
+                "No analysis activity recorded in this session.";
+
+            container.appendChild(empty);
+
+            setText(
+                "historyStatus",
+                "No activity recorded."
+            );
+
+            return;
+        }
+
+        setText(
+            "historyStatus",
+            `${sessionHistory.length} session activity item(s).`
+        );
+
+        sessionHistory.forEach(entry => {
+
+            const card = document.createElement("article");
+
+            card.className = "knowledge-base-item";
+
+            const content = document.createElement("div");
+
+            const heading = document.createElement("h3");
+
+            heading.textContent = entry.title;
+
+            const detail = document.createElement("p");
+
+            detail.textContent = entry.details;
+
+            const date = document.createElement("small");
+
+            date.textContent = entry.date;
+
+            content.appendChild(heading);
+            content.appendChild(detail);
+            content.appendChild(date);
+
+            card.appendChild(content);
+
+            container.appendChild(card);
+
+        });
+
+    }
 
 
     // =====================================
-    // 4. SECURITY LOGS
+    // 5. LOGOUT
+    // =====================================
+
+    $("logoutBtn").addEventListener(
+        "click",
+        async () => {
+
+            try {
+
+                await apiRequest("/auth/logout", {
+                    method: "POST"
+                });
+
+                window.location.href = "/login";
+
+            } catch (error) {
+
+                alert(error.message);
+
+            }
+
+        }
+    );
+
+
+    // =====================================
+    // 6. SECURITY LOGS
     // =====================================
 
     async function loadSecurityLogs() {
 
-        $("statusMessage").textContent =
-            "Loading security logs...";
+        setText(
+            "statusMessage",
+            "Loading security logs..."
+        );
 
         try {
 
             const data = await apiRequest("/logs");
+
             const logs = data.logs || [];
 
-            $("totalLogs").textContent =
-                data.total_logs ?? logs.length;
+            setText(
+                "totalLogs",
+                data.total_logs ?? logs.length
+            );
 
-            $("phishingCount").textContent =
+            setText(
+                "phishingCount",
                 logs.filter(log =>
                     (log.predicted_category || "")
                         .toLowerCase()
                         .includes("phishing")
-                ).length;
+                ).length
+            );
 
-            $("suspiciousCount").textContent =
+            setText(
+                "suspiciousCount",
                 logs.filter(log =>
                     (log.predicted_category || "")
                         .toLowerCase()
                         .includes("suspicious")
-                ).length;
+                ).length
+            );
 
-            $("benignCount").textContent =
+            setText(
+                "benignCount",
                 logs.filter(log =>
                     (log.predicted_category || "")
                         .toLowerCase()
                         .includes("benign")
-                ).length;
+                ).length
+            );
 
             const table = $("logsTable");
+
             table.replaceChildren();
 
             if (logs.length === 0) {
 
-                $("statusMessage").textContent =
-                    "No security events recorded.";
+                setText(
+                    "statusMessage",
+                    "No security events recorded."
+                );
 
                 return;
+
             }
 
             logs.forEach(log => {
@@ -137,7 +276,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     const cell = document.createElement("td");
 
-                    cell.textContent = value;
+                    cell.textContent = value ?? "";
 
                     row.appendChild(cell);
 
@@ -147,13 +286,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             });
 
-            $("statusMessage").textContent =
-                `Showing ${logs.length} security events.`;
+            setText(
+                "statusMessage",
+                `Showing ${logs.length} security events.`
+            );
 
         } catch (error) {
 
-            $("statusMessage").textContent =
-                error.message;
+            setText(
+                "statusMessage",
+                error.message
+            );
 
         }
 
@@ -161,7 +304,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 5. CREATE SECURITY EVENT
+    // 7. CREATE SECURITY EVENT
     // =====================================
 
     $("securityLogForm").addEventListener(
@@ -183,30 +326,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
             try {
 
-                const result = await apiRequest("/logs", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(payload)
-                });
+                const result = await apiRequest(
+                    "/logs",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(payload)
+                    }
+                );
 
-                $("logFormStatus").textContent =
-                    result.message;
+                setText(
+                    "logFormStatus",
+                    result.message || "Event saved."
+                );
 
                 $("securityLogForm").reset();
+
+                addHistoryEntry(
+                    "Security Event",
+                    payload.event_type
+                );
 
                 await loadSecurityLogs();
 
             } catch (error) {
 
-                $("logFormStatus").textContent =
-                    error.message;
+                setText(
+                    "logFormStatus",
+                    error.message
+                );
 
             } finally {
 
                 button.disabled = false;
-                button.textContent = "Save Security Event";
+
+                button.textContent =
+                    "Save Security Event";
 
             }
 
@@ -215,96 +372,100 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 6. DOCUMENT PROCESSING
+    // 8. DOCUMENT ANALYSIS
     // =====================================
 
-    // Allow clicking Analyze even without a file.
-    $("analyzeDocumentBtn").disabled = false;
+    $("documentInput").addEventListener(
+        "change",
+        () => {
+
+            const file = $("documentInput").files[0];
+
+            if (!file) return;
+
+            const allowed = [
+                ".pdf",
+                ".txt",
+                ".csv",
+                ".docx"
+            ];
+
+            const extension =
+                "." + file.name.split(".").pop().toLowerCase();
+
+            if (!allowed.includes(extension)) {
+
+                setText(
+                    "documentStatus",
+                    "Unsupported format. Use PDF, TXT, CSV or DOCX."
+                );
+
+                $("documentInput").value = "";
+
+                selectedDocument = null;
+
+                return;
+
+            }
+
+            if (
+                file.size === 0 ||
+                file.size > 10 * 1024 * 1024
+            ) {
+
+                setText(
+                    "documentStatus",
+                    "File must be non-empty and no larger than 10 MB."
+                );
+
+                $("documentInput").value = "";
+
+                selectedDocument = null;
+
+                return;
+
+            }
+
+            selectedDocument = file;
+
+            setText(
+                "documentFileName",
+                file.name
+            );
+
+            $("documentFileInfo").hidden = false;
+
+            $("analyzeDocumentBtn").disabled = false;
+
+            setText(
+                "documentStatus",
+                "Document selected. Ready for analysis."
+            );
+
+        }
+    );
 
 
-    // -------------------------------------
-    // DOCUMENT SELECTION
-    // -------------------------------------
+    $("removeDocument").addEventListener(
+        "click",
+        () => {
 
-    $("documentInput").addEventListener("change", () => {
-
-        const file = $("documentInput").files[0];
-
-        if (!file) return;
-
-        const allowed = [
-            ".pdf",
-            ".txt",
-            ".csv",
-            ".docx"
-        ];
-
-        const extension =
-            "." + file.name.split(".").pop().toLowerCase();
-
-        if (!allowed.includes(extension)) {
-
-            $("documentStatus").textContent =
-                "Unsupported file format. Use PDF, TXT, CSV or DOCX.";
-
-            $("documentInput").value = "";
             selectedDocument = null;
 
-            return;
-        }
-
-        if (
-            file.size === 0 ||
-            file.size > 10 * 1024 * 1024
-        ) {
-
-            $("documentStatus").textContent =
-                "File must be non-empty and no larger than 10 MB.";
-
             $("documentInput").value = "";
-            selectedDocument = null;
 
-            return;
+            $("documentFileInfo").hidden = true;
+
+            $("analyzeDocumentBtn").disabled = false;
+
+            setText(
+                "documentStatus",
+                "No file attached."
+            );
+
         }
+    );
 
-        selectedDocument = file;
-
-        $("documentFileName").textContent =
-            file.name;
-
-        $("documentFileInfo").hidden = false;
-
-        $("analyzeDocumentBtn").disabled = false;
-
-        $("documentStatus").textContent =
-            "Document selected. Ready for analysis.";
-
-    });
-
-
-    // -------------------------------------
-    // REMOVE DOCUMENT
-    // -------------------------------------
-
-    $("removeDocument").addEventListener("click", () => {
-
-        selectedDocument = null;
-
-        $("documentInput").value = "";
-
-        $("documentFileInfo").hidden = true;
-
-        $("analyzeDocumentBtn").disabled = false;
-
-        $("documentStatus").textContent =
-            "No file attached. Select a document to begin.";
-
-    });
-
-
-    // -------------------------------------
-    // ANALYZE DOCUMENT
-    // -------------------------------------
 
     $("analyzeDocumentBtn").addEventListener(
         "click",
@@ -312,23 +473,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!selectedDocument) {
 
-                $("documentStatus").textContent =
-                    "No file attached. Please select a document first.";
+                setText(
+                    "documentStatus",
+                    "Please select a document first."
+                );
 
                 return;
+
             }
 
             const button = $("analyzeDocumentBtn");
 
+            const fileBeingAnalyzed =
+                selectedDocument;
+
             const formData = new FormData();
 
-            formData.append("file", selectedDocument);
+            formData.append(
+                "file",
+                fileBeingAnalyzed
+            );
 
             button.disabled = true;
+
             button.textContent = "Analyzing...";
 
-            $("documentStatus").textContent =
-                "Sending document to local AI...";
+            setText(
+                "documentStatus",
+                "Processing document..."
+            );
 
             try {
 
@@ -340,16 +513,36 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 );
 
-                $("uploadAnalysisTitle").textContent =
-                    result.filename || selectedDocument.name;
+                setText(
+                    "uploadAnalysisTitle",
+                    result.filename ||
+                    fileBeingAnalyzed.name
+                );
 
-                $("uploadAnalysisContent").textContent =
-                    result.analysis || "No analysis returned.";
+                const content =
+                    $("uploadAnalysisContent");
+
+                content.replaceChildren();
+
+                content.appendChild(
+                    createReportBlock(
+                        result.analysis ||
+                        result.report ||
+                        "No analysis returned."
+                    )
+                );
 
                 $("uploadAnalysisOutput").hidden = false;
 
-                $("documentStatus").textContent =
-                    "Document analyzed and indexed successfully.";
+                setText(
+                    "documentStatus",
+                    "Document analysis completed."
+                );
+
+                addHistoryEntry(
+                    "Document Analysis",
+                    fileBeingAnalyzed.name
+                );
 
                 await loadKnowledgeBase();
 
@@ -359,13 +552,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             } catch (error) {
 
-                $("documentStatus").textContent =
-                    error.message;
+                setText(
+                    "documentStatus",
+                    error.message
+                );
 
             } finally {
 
                 button.disabled = false;
-                button.textContent = "Analyze Document";
+
+                button.textContent =
+                    "Analyze Document";
 
             }
 
@@ -374,136 +571,245 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 7. IMAGE PROCESSING
+    // 9. IMAGE PREVIEW AND ANALYSIS UI
     // =====================================
 
-    // Allow clicking Analyze even without an image.
-    $("analyzeImageBtn").disabled = false;
+    $("imageInput").addEventListener(
+        "change",
+        () => {
 
+            const file = $("imageInput").files[0];
 
-    // -------------------------------------
-    // IMAGE SELECTION AND PREVIEW
-    // -------------------------------------
+            if (!file) return;
 
-    $("imageInput").addEventListener("change", () => {
+            const allowed = [
+                "image/png",
+                "image/jpeg",
+                "image/webp"
+            ];
 
-        const file = $("imageInput").files[0];
+            if (!allowed.includes(file.type)) {
 
-        if (!file) return;
+                setText(
+                    "imageStatus",
+                    "Unsupported format. Use PNG, JPEG or WEBP."
+                );
 
-        const allowed = [
-            "image/png",
-            "image/jpeg",
-            "image/webp"
-        ];
+                $("imageInput").value = "";
 
-        if (!allowed.includes(file.type)) {
+                selectedImage = null;
 
-            $("imageStatus").textContent =
-                "Unsupported image format. Use PNG, JPEG or WEBP.";
+                return;
 
-            $("imageInput").value = "";
-            selectedImage = null;
+            }
 
-            return;
-        }
+            if (
+                file.size === 0 ||
+                file.size > 10 * 1024 * 1024
+            ) {
 
-        if (
-            file.size === 0 ||
-            file.size > 10 * 1024 * 1024
-        ) {
+                setText(
+                    "imageStatus",
+                    "Image must be non-empty and no larger than 10 MB."
+                );
 
-            $("imageStatus").textContent =
-                "Image must be non-empty and no larger than 10 MB.";
+                $("imageInput").value = "";
 
-            $("imageInput").value = "";
-            selectedImage = null;
+                selectedImage = null;
 
-            return;
-        }
+                return;
 
-        if ($("imagePreview").src.startsWith("blob:")) {
+            }
 
-            URL.revokeObjectURL(
-                $("imagePreview").src
+            if ($("imagePreview").src.startsWith("blob:")) {
+
+                URL.revokeObjectURL(
+                    $("imagePreview").src
+                );
+
+            }
+
+            selectedImage = file;
+
+            $("imagePreview").src =
+                URL.createObjectURL(file);
+
+            $("imagePreviewContainer").hidden = false;
+
+            $("analyzeImageBtn").disabled = false;
+
+            setText(
+                "imageStatus",
+                "Image selected."
             );
 
         }
-
-        selectedImage = file;
-
-        $("imagePreview").src =
-            URL.createObjectURL(file);
-
-        $("imagePreviewContainer").hidden = false;
-
-        $("analyzeImageBtn").disabled = false;
-
-        $("imageStatus").textContent =
-            "Image selected. Ready for analysis.";
-
-    });
+    );
 
 
-    // -------------------------------------
-    // REMOVE IMAGE
-    // -------------------------------------
+    $("removeImage").addEventListener(
+        "click",
+        () => {
 
-    $("removeImage").addEventListener("click", () => {
+            if ($("imagePreview").src.startsWith("blob:")) {
 
-        if ($("imagePreview").src.startsWith("blob:")) {
+                URL.revokeObjectURL(
+                    $("imagePreview").src
+                );
 
-            URL.revokeObjectURL(
-                $("imagePreview").src
+            }
+
+            selectedImage = null;
+
+            $("imageInput").value = "";
+
+            $("imagePreview").removeAttribute("src");
+
+            $("imagePreviewContainer").hidden = true;
+
+            $("imageAnalysisOutput").hidden = true;
+
+            setText(
+                "imageStatus",
+                "No image selected."
             );
 
         }
+    );
 
-        selectedImage = null;
-
-        $("imageInput").value = "";
-
-        $("imagePreview").removeAttribute("src");
-
-        $("imagePreviewContainer").hidden = true;
-
-        $("analyzeImageBtn").disabled = false;
-
-        $("imageStatus").textContent =
-            "No image attached. Select an image to begin.";
-
-    });
-
-
-    // -------------------------------------
-    // IMAGE ANALYSIS
-    // -------------------------------------
 
     $("analyzeImageBtn").addEventListener(
         "click",
         async () => {
 
             if (!selectedImage) {
-
-                $("imageStatus").textContent =
-                    "No image attached. Please select an image first.";
-
+                setText(
+                    "imageStatus",
+                    "Select an image first."
+                );
                 return;
             }
 
-            // Image preview is implemented.
-            // A vision model and backend endpoint are
-            // not connected yet.
+            const button = $("analyzeImageBtn");
+            const output = $("imageAnalysisContent");
 
-            $("imageStatus").textContent =
-                "Image selected successfully. AI image analysis is not available yet because a vision model has not been configured.";
+            button.disabled = true;
 
+            setText(
+                "imageStatus",
+                "Analyzing image..."
+            );
+
+            output.replaceChildren();
+
+            try {
+
+                // Prepare the image for upload.
+                const formData = new FormData();
+
+                formData.append("file", selectedImage);
+
+                // Send image to FastAPI.
+                const response = await fetch(
+                    "/image/analyze",
+                    {
+                        method: "POST",
+                        credentials: "same-origin",
+                        body: formData
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.detail || "Image analysis failed."
+                    );
+                }
+
+                const result = data.analysis;
+
+                // Build the actual analysis report.
+                const report = [
+                    "IMAGE SECURITY ANALYSIS",
+                    "",
+                    "Filename: " + result.filename,
+                    "Verdict: " + result.verdict,
+                    "Format: " + result.format,
+                    "Dimensions: " +
+                        result.width + " x " + result.height,
+                    "File Size: " +
+                        (result.file_size / 1024).toFixed(2) + " KB",
+                    "SHA-256: " + result.sha256,
+                    "Byte Entropy: " + result.entropy,
+                    "",
+                    "FINDINGS",
+                    ...(result.findings || []).map(
+                        (finding, index) =>
+                            (index + 1) + ". " + finding
+                    ),
+                    "",
+                    "IMAGE METADATA",
+                    JSON.stringify(
+                        result.metadata || {},
+                        null,
+                        2
+                    ),
+                    "",
+                    "Note: This is technical image inspection. " +
+                    "It does not establish whether an image is malicious."
+                ].join("\n");
+
+                // Display results in the dashboard.
+                output.replaceChildren();
+
+                output.appendChild(
+                    createReportBlock(report)
+                );
+
+                $("imageAnalysisTitle").textContent =
+                    result.filename || selectedImage.name;
+
+                $("imageAnalysisOutput").hidden = false;
+
+                setText(
+                    "imageStatus",
+                    "Image analysis completed successfully."
+                );
+
+                addHistoryEntry(
+                    "Image Analysis",
+                    selectedImage.name
+                );
+
+            } catch (error) {
+
+                setText(
+                    "imageStatus",
+                    error.message || "Could not analyze image."
+                );
+
+                output.replaceChildren();
+
+                output.appendChild(
+                    createReportBlock(
+                        "Image analysis failed.\n\n" +
+                        (error.message || "Unknown error.")
+                    )
+                );
+
+                $("imageAnalysisOutput").hidden = false;
+
+            } finally {
+
+                button.disabled = !selectedImage;
+
+            }
         }
     );
 
-
     // =====================================
-    // 8. KNOWLEDGE BASE MANAGEMENT
+    // 10. KNOWLEDGE BASE
     // =====================================
 
     async function loadKnowledgeBase() {
@@ -514,8 +820,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const refreshButton =
             $("refreshKnowledgeBaseBtn");
-
-        if (!list || !status) return;
 
         status.textContent =
             "Loading documents...";
@@ -532,14 +836,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 "/files/knowledge-base"
             );
 
-            const documents = data.documents || [];
+            const documents =
+                data.documents || [];
 
             if (documents.length === 0) {
 
                 status.textContent =
-                    "Your Knowledge Base is empty.";
+                    "Knowledge Base is empty.";
 
-                const empty = document.createElement("p");
+                const empty =
+                    document.createElement("p");
 
                 empty.textContent =
                     "Upload a document to get started.";
@@ -547,14 +853,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 list.appendChild(empty);
 
                 return;
+
             }
 
             status.textContent =
                 `${documents.length} document(s) stored.`;
 
-            documents.forEach(document => {
+            documents.forEach(documentData => {
 
-                const card = document.createElement("div");
+                const card =
+                    document.createElement("div");
 
                 card.className =
                     "knowledge-base-item";
@@ -566,22 +874,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.createElement("h3");
 
                 name.textContent =
-                    document.filename;
+                    documentData.filename;
 
                 const metadata =
                     document.createElement("p");
 
-                const sizeMB =
-                    (
-                        document.file_size /
-                        (1024 * 1024)
-                    ).toFixed(2);
+                const sizeMB = (
+                    documentData.file_size /
+                    (1024 * 1024)
+                ).toFixed(2);
 
                 metadata.textContent =
-                    `${sizeMB} MB | ${document.chunks} chunks | ${document.status}`;
+                    `${sizeMB} MB | ` +
+                    `${documentData.chunks} chunks | ` +
+                    `${documentData.status}`;
 
                 details.appendChild(name);
-
                 details.appendChild(metadata);
 
                 const deleteButton =
@@ -591,15 +899,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 deleteButton.textContent = "Delete";
 
-                deleteButton.className = "ghost-btn";
+                deleteButton.className =
+                    "ghost-btn";
 
                 deleteButton.addEventListener(
                     "click",
                     async () => {
 
-                        const confirmed = window.confirm(
-                            `Delete "${document.filename}" from your Knowledge Base?`
-                        );
+                        const confirmed =
+                            window.confirm(
+                                `Delete "${documentData.filename}" from your Knowledge Base?`
+                            );
 
                         if (!confirmed) return;
 
@@ -611,7 +921,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         try {
 
                             await apiRequest(
-                                `/files/knowledge-base/${document.id}`,
+                                `/files/knowledge-base/${documentData.id}`,
                                 {
                                     method: "DELETE"
                                 }
@@ -658,10 +968,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // -------------------------------------
-    // REFRESH KNOWLEDGE BASE
-    // -------------------------------------
-
     $("refreshKnowledgeBaseBtn").addEventListener(
         "click",
         loadKnowledgeBase
@@ -669,78 +975,84 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 9. CHAT ATTACHMENT MANAGEMENT
+    // 11. CHAT ATTACHMENTS
     // =====================================
 
-    // -------------------------------------
-    // OPEN FILE SELECTOR
-    // -------------------------------------
-
-    $("attachFileBtn").addEventListener("click", () => {
-
-        $("chatFileInput").click();
-
-    });
-
-
-    // -------------------------------------
-    // CHAT ATTACHMENT SELECTION
-    // -------------------------------------
-
-    $("chatFileInput").addEventListener("change", () => {
-
-        chatAttachment =
-            $("chatFileInput").files[0];
-
-        if (!chatAttachment) return;
-
-        const allowed = [
-            ".pdf",
-            ".txt",
-            ".csv",
-            ".docx"
-        ];
-
-        const extension =
-            "." + chatAttachment.name.split(".").pop().toLowerCase();
-
-        if (!allowed.includes(extension)) {
-
-            $("chatStatus").textContent =
-                "Only PDF, TXT, CSV and DOCX files are supported.";
-
-            clearChatAttachment();
-
-            return;
+    $("attachFileBtn").addEventListener(
+        "click",
+        () => {
+            $("chatFileInput").click();
         }
+    );
 
-        if (
-            chatAttachment.size === 0 ||
-            chatAttachment.size > 10 * 1024 * 1024
-        ) {
 
-            $("chatStatus").textContent =
-                "File must be non-empty and no larger than 10 MB.";
+    $("chatFileInput").addEventListener(
+        "change",
+        () => {
 
-            clearChatAttachment();
+            chatAttachment =
+                $("chatFileInput").files[0];
 
-            return;
+            if (!chatAttachment) return;
+
+            const allowed = [
+                ".pdf",
+                ".txt",
+                ".csv",
+                ".docx"
+            ];
+
+            const extension =
+                "." +
+                chatAttachment.name
+                    .split(".")
+                    .pop()
+                    .toLowerCase();
+
+            if (!allowed.includes(extension)) {
+
+                setText(
+                    "chatStatus",
+                    "Only PDF, TXT, CSV and DOCX files are supported."
+                );
+
+                clearChatAttachment();
+
+                return;
+
+            }
+
+            if (
+                chatAttachment.size === 0 ||
+                chatAttachment.size > 10 * 1024 * 1024
+            ) {
+
+                setText(
+                    "chatStatus",
+                    "File must be non-empty and no larger than 10 MB."
+                );
+
+                clearChatAttachment();
+
+                return;
+
+            }
+
+            setText(
+                "chatAttachmentName",
+                chatAttachment.name
+            );
+
+            $("chatAttachmentPreview").hidden = false;
+
+            setText(
+                "chatStatus",
+                "Attachment ready."
+            );
+
         }
+    );
 
-        $("chatAttachmentName").textContent =
-            chatAttachment.name;
-
-        $("chatAttachmentPreview").hidden = false;
-
-        $("chatStatus").textContent =
-            "File attached. Enter your question and send.";
-
-    });
-
-
-    // -------------------------------------
-    // CLEAR CHAT ATTACHMENT
-    // -------------------------------------
 
     function clearChatAttachment() {
 
@@ -755,27 +1067,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    // -------------------------------------
-    // REMOVE CHAT ATTACHMENT
-    // -------------------------------------
-
     $("removeChatAttachment").addEventListener(
         "click",
         () => {
 
             clearChatAttachment();
 
-            $("chatStatus").textContent = "";
+            setText(
+                "chatStatus",
+                ""
+            );
 
         }
     );
 
 
     // =====================================
-    // 10. CHAT MESSAGE RENDERING
+    // 12. CHAT MESSAGE RENDERING
     // =====================================
 
-    function renderMessage(role, content, sources = []) {
+    function renderMessage(
+        role,
+        content,
+        sources = []
+    ) {
 
         const message =
             document.createElement("div");
@@ -789,17 +1104,13 @@ document.addEventListener("DOMContentLoaded", () => {
         messageContent.className =
             "message-content";
 
-        // textContent prevents uploaded or AI-generated
-        // content from being interpreted as HTML.
         messageContent.textContent =
-            content;
+            content || "";
 
         message.appendChild(messageContent);
 
 
-        // ---------------------------------
         // RAG SOURCE ATTRIBUTION
-        // ---------------------------------
 
         if (
             role === "assistant" &&
@@ -838,7 +1149,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     "message-source-filename";
 
                 filename.textContent =
-                    source.filename || "Unknown document";
+                    source.filename ||
+                    "Unknown document";
 
                 const chunkInfo =
                     document.createElement("p");
@@ -877,7 +1189,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 11. RESET CHAT INTERFACE
+    // 13. RESET CHAT
     // =====================================
 
     function resetChatInterface() {
@@ -893,18 +1205,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         $("chatInput").value = "";
 
-        $("chatStatus").textContent = "";
+        setText(
+            "chatStatus",
+            ""
+        );
 
     }
 
 
     // =====================================
-    // 12. LOAD CONVERSATION HISTORY
+    // 14. LOAD CONVERSATIONS
     // =====================================
 
     async function loadConversations() {
 
-        const list = $("conversationList");
+        const list =
+            $("conversationList");
 
         list.textContent =
             "Loading conversations...";
@@ -934,6 +1250,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 list.appendChild(empty);
 
                 return;
+
             }
 
             conversations.forEach(conversation => {
@@ -956,16 +1273,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     "conversation-open";
 
                 openButton.textContent =
+                    shortTitle(conversation.title);
+
+                openButton.title =
                     conversation.title || "New Conversation";
 
                 openButton.addEventListener(
                     "click",
                     () => {
-
                         openConversation(
                             conversation.id
                         );
-
                     }
                 );
 
@@ -986,11 +1304,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 deleteButton.addEventListener(
                     "click",
                     () => {
-
                         deleteConversation(
                             conversation.id
                         );
-
                     }
                 );
 
@@ -1015,7 +1331,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 13. ACTIVE CONVERSATION HIGHLIGHT
+    // 15. ACTIVE CONVERSATION
     // =====================================
 
     function updateActiveConversation() {
@@ -1037,13 +1353,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 14. OPEN PREVIOUS CONVERSATION
+    // 16. OPEN CONVERSATION
     // =====================================
 
-    async function openConversation(conversationId) {
+    async function openConversation(
+        conversationId
+    ) {
 
-        $("chatStatus").textContent =
-            "Loading conversation...";
+        setText(
+            "chatStatus",
+            "Loading conversation..."
+        );
 
         try {
 
@@ -1073,12 +1393,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             updateActiveConversation();
 
-            $("chatStatus").textContent = "";
+            setText(
+                "chatStatus",
+                ""
+            );
 
         } catch (error) {
 
-            $("chatStatus").textContent =
-                error.message;
+            setText(
+                "chatStatus",
+                error.message
+            );
 
         }
 
@@ -1086,27 +1411,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 15. CREATE NEW CHAT
+    // 17. NEW CHAT
     // =====================================
 
-    $("newChatBtn").addEventListener("click", () => {
+    $("newChatBtn").addEventListener(
+        "click",
+        () => {
 
-        resetChatInterface();
+            resetChatInterface();
 
-        $("chatInput").focus();
+            $("chatInput").focus();
 
-    });
+        }
+    );
 
 
     // =====================================
-    // 16. DELETE CONVERSATION
+    // 18. DELETE CONVERSATION
     // =====================================
 
-    async function deleteConversation(conversationId) {
+    async function deleteConversation(
+        conversationId
+    ) {
 
-        const confirmed = window.confirm(
-            "Are you sure you want to delete this conversation?"
-        );
+        const confirmed =
+            window.confirm(
+                "Delete this conversation?"
+            );
 
         if (!confirmed) return;
 
@@ -1130,13 +1461,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
             await loadConversations();
 
-            $("chatStatus").textContent =
-                "Conversation deleted successfully.";
+            setText(
+                "chatStatus",
+                "Conversation deleted."
+            );
 
         } catch (error) {
 
-            $("chatStatus").textContent =
-                error.message;
+            setText(
+                "chatStatus",
+                error.message
+            );
 
         }
 
@@ -1144,27 +1479,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 17. CHAT SUGGESTIONS
+    // 19. CHAT SUGGESTIONS
     // =====================================
 
-    document.addEventListener("click", (event) => {
+    document.addEventListener(
+        "click",
+        (event) => {
 
-        const button =
-            event.target.closest(".suggestion-btn");
+            const button =
+                event.target.closest(
+                    ".suggestion-btn"
+                );
 
-        if (!button) return;
+            if (!button) return;
 
-        $("chatInput").value =
-            button.dataset.question || "";
+            $("chatInput").value =
+                button.dataset.question || "";
 
-        $("chatInput").focus();
+            $("chatInput").focus();
 
-    });
+        }
+    );
 
 
     // =====================================
-    // 18. ENTER TO SEND
-    // SHIFT + ENTER FOR NEW LINE
+    // 20. ENTER TO SEND
     // =====================================
 
     $("chatInput").addEventListener(
@@ -1188,7 +1527,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 19. SEND CHAT MESSAGE
+    // 21. CHAT SUBMISSION
     // =====================================
 
     $("chatForm").addEventListener(
@@ -1207,15 +1546,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
             button.disabled = true;
 
-            $("chatStatus").textContent =
+            setText(
+                "chatStatus",
                 chatAttachment
-                    ? "Processing attachment and generating answer..."
-                    : "CyberMind AI is thinking...";
+                    ? "Processing attachment..."
+                    : "CyberMind AI is thinking..."
+            );
+
+            const attachmentName =
+                chatAttachment
+                    ? chatAttachment.name
+                    : null;
 
             renderMessage(
                 "user",
-                chatAttachment
-                    ? `[Attachment: ${chatAttachment.name}]\n${question}`
+                attachmentName
+                    ? `[Attachment: ${attachmentName}]\n${question}`
                     : question
             );
 
@@ -1229,9 +1575,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     Boolean(chatAttachment);
 
 
-                // ---------------------------------
-                // CHAT WITH ATTACHMENT
-                // ---------------------------------
+                // ATTACHMENT CHAT
 
                 if (wasAttachmentChat) {
 
@@ -1248,7 +1592,9 @@ document.addEventListener("DOMContentLoaded", () => {
                         chatAttachment
                     );
 
-                    if (currentConversationId !== null) {
+                    if (
+                        currentConversationId !== null
+                    ) {
 
                         formData.append(
                             "conversation_id",
@@ -1270,15 +1616,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
 
-                // ---------------------------------
-                // NORMAL CHAT WITH RAG
-                // ---------------------------------
+                // NORMAL RAG CHAT
 
                 else {
 
                     const payload = {
                         message: question,
-                        conversation_id: currentConversationId
+                        conversation_id:
+                            currentConversationId
                     };
 
                     result = await apiRequest(
@@ -1286,7 +1631,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         {
                             method: "POST",
                             headers: {
-                                "Content-Type": "application/json"
+                                "Content-Type":
+                                    "application/json"
                             },
                             body: JSON.stringify(payload)
                         }
@@ -1295,27 +1641,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
 
-                // ---------------------------------
-                // UPDATE CONVERSATION
-                // ---------------------------------
+                // CONVERSATION ID
 
                 currentConversationId =
                     result.conversation_id;
 
 
-                // ---------------------------------
-                // DISPLAY ANSWER AND SOURCES
-                // ---------------------------------
+                // RESPONSE
 
                 renderMessage(
                     "assistant",
-                    result.answer,
+                    result.answer ||
+                    "No answer returned.",
                     wasAttachmentChat
                         ? []
                         : (result.sources || [])
                 );
 
-                $("chatStatus").textContent = "";
+
+                addHistoryEntry(
+                    "AI Chat",
+                    question
+                );
+
+                setText(
+                    "chatStatus",
+                    ""
+                );
 
                 await loadConversations();
 
@@ -1327,8 +1679,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     error.message
                 );
 
-                $("chatStatus").textContent =
-                    error.message;
+                setText(
+                    "chatStatus",
+                    error.message
+                );
 
             } finally {
 
@@ -1343,37 +1697,267 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // =====================================
-    // 20. CURRENT DATE
+    // 22. PHISHING URL UI
     // =====================================
 
-    const dateElement =
-        $("currentDate");
+    $("phishingUrlForm").addEventListener(
+        "submit",
+        async (event) => {
 
-    if (dateElement) {
+            event.preventDefault();
 
-        dateElement.textContent =
-            new Date().toLocaleDateString(
-                undefined,
-                {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric"
-                }
+            const url =
+                $("phishingUrlInput").value.trim();
+
+            if (!url) return;
+
+            const button =
+                $("analyzeUrlBtn");
+
+            button.disabled = true;
+
+            button.textContent =
+                "Analyzing...";
+
+            setText(
+                "phishingUrlStatus",
+                "Processing URL..."
             );
 
-    }
+            $("phishingAnalysisOutput").hidden =
+                true;
+
+            try {
+
+                // Assumes the backend accepts
+                // { "url": "..." } at /url/analyze.
+                // Confirm this against your route.
+
+                const result = await apiRequest(
+                    "/url/analyze",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+                        body: JSON.stringify({
+                            url: url
+                        })
+                    }
+                );
+
+                const content =
+                    $("phishingAnalysisContent");
+
+                content.replaceChildren();
+
+                content.appendChild(
+                    createReportBlock(
+                        result.report ||
+                        result.analysis ||
+                        result.message ||
+                        JSON.stringify(
+                            result,
+                            null,
+                            2
+                        )
+                    )
+                );
+
+                $("phishingAnalysisOutput").hidden =
+                    false;
+
+                setText(
+                    "phishingUrlStatus",
+                    "URL assessment completed."
+                );
+
+                addHistoryEntry(
+                    "URL Assessment",
+                    url
+                );
+
+                $("phishingAnalysisOutput").scrollIntoView({
+                    behavior: "smooth"
+                });
+
+            } catch (error) {
+
+                setText(
+                    "phishingUrlStatus",
+                    error.message
+                );
+
+            } finally {
+
+                button.disabled = false;
+
+                button.textContent =
+                    "Analyze URL";
+
+            }
+
+        }
+    );
 
 
     // =====================================
-    // 21. INITIALIZE DASHBOARD
+    // 23. THREAT INTELLIGENCE
     // =====================================
 
-    // Enable both standalone analysis buttons.
-    // Missing attachments are handled by their click handlers.
+    $("threatIntelligenceForm").addEventListener(
+        "submit",
+        async (event) => {
 
-    $("analyzeDocumentBtn").disabled = false;
+            event.preventDefault();
 
-    $("analyzeImageBtn").disabled = false;
+            const indicator =
+                $("threatIndicatorInput").value.trim();
+
+            if (!indicator) {
+
+                setText(
+                    "threatIntelligenceStatus",
+                    "Enter an indicator first."
+                );
+
+                return;
+
+            }
+
+            const button =
+                $("analyzeThreatIndicatorBtn");
+
+            button.disabled = true;
+
+            button.textContent =
+                "Assessing...";
+
+            setText(
+                "threatIntelligenceStatus",
+                "Processing indicator..."
+            );
+
+            $("threatIntelligenceOutput").hidden =
+                true;
+
+            try {
+
+                const result = await apiRequest(
+                    "/threat-intelligence/analyze",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+                        body: JSON.stringify({
+                            indicator: indicator
+                        })
+                    }
+                );
+
+                const analysis =
+                    result.analysis || result;
+
+                setText(
+                    "threatIndicatorType",
+                    "Indicator Type: " +
+                    (
+                        analysis.indicator_type ||
+                        "Unknown"
+                    )
+                );
+
+                const content =
+                    $("threatIntelligenceContent");
+
+                content.replaceChildren();
+
+                content.appendChild(
+                    createReportBlock(
+                        analysis.report ||
+                        analysis.message ||
+                        result.report ||
+                        result.message ||
+                        JSON.stringify(
+                            analysis,
+                            null,
+                            2
+                        )
+                    )
+                );
+
+                $("threatIntelligenceOutput").hidden =
+                    false;
+
+                setText(
+                    "threatIntelligenceStatus",
+                    "Assessment completed."
+                );
+
+                addHistoryEntry(
+                    "Threat Intelligence",
+                    indicator
+                );
+
+                $("threatIntelligenceOutput").scrollIntoView({
+                    behavior: "smooth"
+                });
+
+            } catch (error) {
+
+                setText(
+                    "threatIntelligenceStatus",
+                    error.message
+                );
+
+            } finally {
+
+                button.disabled = false;
+
+                button.textContent =
+                    "Assess Indicator";
+
+            }
+
+        }
+    );
+
+
+    // =====================================
+    // 24. DATE
+    // =====================================
+
+    setText(
+        "currentDate",
+        new Date().toLocaleDateString(
+            undefined,
+            {
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            }
+        )
+    );
+
+
+    // =====================================
+    // 25. HISTORY REFRESH
+    // =====================================
+
+    $("refreshHistoryBtn").addEventListener(
+        "click",
+        renderHistory
+    );
+
+
+    // =====================================
+    // 26. INITIALIZE
+    // =====================================
+
+    renderHistory();
 
     loadSecurityLogs();
 

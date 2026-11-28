@@ -2,284 +2,420 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="CyberMind AI - Local Cybersecurity Intelligence Platform">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#060f2a">
+
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+
     <title>CyberMind AI | Dashboard</title>
-    <style>
-        /* Safe defaults: page stays black/navy even before dashboard.css loads */
-        html, body { margin: 0; background: #05070c; color: #e8edf6; font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-        a { color: inherit; text-decoration: none; }
-        .mobile-bar, .scrim { display: none; }
-    </style>
-    <link rel="stylesheet" href="/static/dashboard.css?v=2">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/dashboard.css">
 </head>
 <body>
 
 <div class="app-layout">
 
-    <!-- Mobile top bar -->
-    <div class="mobile-bar">
-        <button type="button" id="menuBtn" class="icon-btn" aria-label="Open menu" aria-expanded="false" aria-controls="sidebar">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
+    <!-- MOBILE TOP BAR (shown on small screens only) -->
+
+    <header class="mobile-bar">
         <strong>CyberMind <span>AI</span></strong>
-    </div>
-    <div class="scrim" id="scrim" hidden></div>
+        <button id="menuToggle" class="menu-btn" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
 
-    <!-- SIDEBAR (navigation) -->
-    <aside class="sidebar" id="sidebar">
+    <div id="scrim" class="scrim" hidden></div>
 
-        <div class="brand">
-            <img src="/static/favicon.svg" width="32" height="32" alt="">
-            <div>
-                <h2>CyberMind <span>AI</span></h2>
-                <small>Local AI · Llama 3.2:1B</small>
-            </div>
-        </div>
 
-        <nav aria-label="Main navigation">
-            <a href="#overview" class="active">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-                Overview
-            </a>
-            <a href="#assistant">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
-                AI Assistant
-            </a>
-            <a href="#report">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg>
-                AI Chat Report
-            </a>
-            <a href="#uploads">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
-                File Intelligence
-            </a>
-            <a href="#security-logs">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg>
-                Security Logs
-            </a>
-            <a href="#history">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                Analysis History
-            </a>
-            <a href="/docs" target="_blank" rel="noopener noreferrer">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8 4 12l4 4M16 8l4 4-4 4M14 5l-4 14"/></svg>
-                API Documentation
-            </a>
+    <!-- SIDEBAR (text-only navigation) -->
+
+    <aside id="sidebar" class="sidebar">
+
+        <div class="brand">CyberMind <span>AI</span></div>
+
+        <nav id="dashboardNavigation">
+            <a href="#overview" class="active">Overview</a>
+            <a href="#assistant">AI Assistant</a>
+            <a href="#uploads">File Intelligence</a>
+            <a href="#image-analysis">Image Analysis</a>
+            <a href="#phishing-analysis">Phishing Link Analysis</a>
+            <a href="#threat-intelligence">Threat Intelligence</a>
+            <a href="#security-logs">Security Logs</a>
+            <a href="#history">Analysis History</a>
+            <a href="/docs" target="_blank" rel="noopener noreferrer">API Documentation</a>
         </nav>
 
-        <div class="user-profile">
-            <div class="user-avatar" aria-hidden="true">U</div>
-            <div class="user-text">
-                <strong id="welcomeUser">My account</strong>
-                <small>Signed in</small>
+        <div class="sidebar-bottom">
+
+            <p class="engine-status">
+                <span class="status-dot"></span>
+                Local AI engine: Llama 3.2:1B
+            </p>
+
+            <div class="user-profile">
+                <div class="user-text">
+                    <strong id="welcomeUser">My account</strong>
+                    <small>Signed in</small>
+                </div>
+                <button id="logoutBtn" type="button" class="ghost-btn small-btn">Log out</button>
             </div>
-            <button type="button" id="logoutBtn" class="icon-btn" title="Log out" aria-label="Log out">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-            </button>
+
         </div>
 
     </aside>
 
 
     <!-- MAIN CONTENT -->
+
     <main class="main-content">
 
         <!-- OVERVIEW -->
+
         <section id="overview" class="dashboard-section">
 
-            <div class="section-title">
-                <h1>Overview</h1>
-                <p>Security monitoring summary. <span id="currentDate"></span></p>
+            <div class="section-title with-actions">
+                <h2>Overview</h2>
+                <p id="currentDate"></p>
             </div>
 
-            <div class="stats-grid">
-                <article class="stat-card"><h3>Total Security Logs</h3><p id="totalLogs">0</p></article>
-                <article class="stat-card"><h3>Phishing Events</h3><p id="phishingCount">0</p></article>
-                <article class="stat-card"><h3>Suspicious Logins</h3><p id="suspiciousCount">0</p></article>
-                <article class="stat-card"><h3>Benign Events</h3><p id="benignCount">0</p></article>
+            <div class="overview-grid">
+
+                <article class="stat-card stat-main">
+                    <h3>Total Security Logs</h3>
+                    <p id="totalLogs">0</p>
+
+                    <div class="split" aria-hidden="true">
+                        <span id="splitPhishing" class="bar-phishing"></span>
+                        <span id="splitSuspicious" class="bar-suspicious"></span>
+                        <span id="splitBenign" class="bar-benign"></span>
+                    </div>
+                    <small>Breakdown by AI classification</small>
+                </article>
+
+                <article class="stat-card">
+                    <h3><span class="tag tag-phishing"></span>Phishing Events</h3>
+                    <p id="phishingCount">0</p>
+                    <small id="pctPhishing">0% of logs</small>
+                </article>
+
+                <article class="stat-card">
+                    <h3><span class="tag tag-suspicious"></span>Suspicious Events</h3>
+                    <p id="suspiciousCount">0</p>
+                    <small id="pctSuspicious">0% of logs</small>
+                </article>
+
+                <article class="stat-card">
+                    <h3><span class="tag tag-benign"></span>Benign Events</h3>
+                    <p id="benignCount">0</p>
+                    <small id="pctBenign">0% of logs</small>
+                </article>
+
             </div>
 
-            <div class="action-row">
-                <a href="#assistant" class="primary-button">Ask the AI</a>
-                <a href="#uploads" class="secondary-button">Scan a file</a>
-                <a href="#security-logs" class="secondary-button">Add security event</a>
-            </div>
+            <h3 class="block-title">System status</h3>
+
+            <ul class="status-list">
+                <li><span>Local language model</span><strong>Online</strong></li>
+                <li><span>Document processing</span><strong>Available</strong></li>
+                <li><span>Image analysis</span><strong>Technical inspection</strong></li>
+            </ul>
 
         </section>
 
 
-        <!-- AI ASSISTANT : chat on the left, history on the right -->
+        <!-- AI ASSISTANT -->
+
         <section id="assistant" class="dashboard-section">
+
+            <div class="section-title">
+                <h2>AI Assistant</h2>
+            </div>
 
             <div class="assistant-container">
 
-                <div class="assistant-header">
-                    <h1>AI Assistant</h1>
-                    <p>Ask questions to CyberMind AI.</p>
-                </div>
+                <!-- CONVERSATIONS -->
 
-                <!-- CHAT HISTORY (right side) -->
-                <aside class="chat-history-panel" aria-label="Conversation history">
+                <div class="chat-history-panel">
+
                     <div class="chat-history-header">
-                        <h3>History</h3>
-                        <button type="button" id="newChatBtn">+ New chat</button>
+                        <h3>Conversations</h3>
+                        <button type="button" id="newChatBtn" class="small-btn">New Chat</button>
                     </div>
-                    <div id="conversationList">
-                        <p class="conversation-empty">Loading conversations...</p>
-                    </div>
-                </aside>
 
-                <!-- CHAT MESSAGES -->
-                <div id="chatMessages" class="chat-messages" aria-live="polite">
-                    <div class="welcome-message">
-                        <h3>How can I help?</h3>
-                        <p>Ask about cybersecurity, networking, programming or your uploaded documents.</p>
-                        <div class="suggestion-grid">
-                            <button type="button" class="suggestion-btn" data-question="Explain failed login attempts.">Explain failed login attempts</button>
-                            <button type="button" class="suggestion-btn" data-question="What is SQL injection?">What is SQL injection?</button>
-                            <button type="button" class="suggestion-btn" data-question="Explain artificial intelligence.">Explain artificial intelligence</button>
-                            <button type="button" class="suggestion-btn" data-question="What is a security log?">Explain security logs</button>
-                        </div>
+                    <div id="conversationList">
+                        <p>Loading conversations...</p>
                     </div>
+
+                    <div id="conversationResize" class="resize-handle" title="Drag down to show more conversations"></div>
+
                 </div>
 
-                <!-- CHAT ATTACHMENT -->
+
+                <!-- CHAT -->
+
+                <div id="chatMessages" class="chat-messages">
+
+                    <div class="welcome-message">
+
+                        <h3>Ask a security question</h3>
+
+                        <p>
+                            Cybersecurity, networking, programming, AI,
+                            or your uploaded documents.
+                        </p>
+
+                        <div class="suggestion-grid">
+                            <button type="button" class="suggestion-btn" data-question="Explain failed login attempts.">
+                                Explain failed login attempts
+                            </button>
+                            <button type="button" class="suggestion-btn" data-question="Explain SQL injection and how to prevent it.">
+                                Explain SQL injection prevention
+                            </button>
+                            <button type="button" class="suggestion-btn" data-question="Explain artificial intelligence.">
+                                Explain artificial intelligence
+                            </button>
+                            <button type="button" class="suggestion-btn" data-question="What is a security log?">
+                                Explain security logs
+                            </button>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ATTACHMENT -->
+
                 <div id="chatAttachmentPreview" hidden>
                     <span id="chatAttachmentName"></span>
-                    <button type="button" id="removeChatAttachment">Remove</button>
+                    <button type="button" id="removeChatAttachment" class="ghost-btn small-btn">Remove</button>
                 </div>
 
-                <!-- CHAT INPUT -->
+
+                <!-- INPUT -->
+
                 <form id="chatForm" class="chat-input-area">
-                    <input type="file" id="chatFileInput" accept=".pdf,.txt,.csv,.docx,.png,.jpg,.jpeg,.webp" hidden>
-                    <button type="button" id="attachFileBtn" title="Attach a document or image" aria-label="Attach a file">+</button>
-                    <textarea id="chatInput" rows="1" placeholder="Ask CyberMind anything..." maxlength="5000" required></textarea>
-                    <button type="submit" id="sendChatBtn" title="Send message" aria-label="Send message">↑</button>
+
+                    <input type="file" id="chatFileInput" accept=".pdf,.txt,.csv,.docx" hidden>
+
+                    <button type="button" id="attachFileBtn" class="ghost-btn" title="Attach document">Attach</button>
+
+                    <textarea
+                        id="chatInput"
+                        placeholder="Ask CyberMind anything..."
+                        maxlength="5000"
+                        required></textarea>
+
+                    <button type="submit" id="sendChatBtn" class="primary" title="Send message">Send</button>
+
                 </form>
 
-                <p id="chatStatus"></p>
+                <p id="chatStatus">Ready.</p>
 
             </div>
-        </section>
 
-
-        <!-- AI CHAT REPORT -->
-        <section id="report" class="dashboard-section">
-            <div class="section-title">
-                <h1>AI Chat Report</h1>
-                <p>Summary of your questions in this session.</p>
-            </div>
-
-            <div class="stats-grid">
-                <article class="stat-card"><h3>Questions Asked</h3><p id="reportQuestions">0</p></article>
-                <article class="stat-card"><h3>Files Attached</h3><p id="reportFiles">0</p></article>
-                <article class="stat-card"><h3>Security Events</h3><p id="reportEvents">0</p></article>
-                <article class="stat-card"><h3>Phishing Events</h3><p id="reportPhishing">0</p></article>
-            </div>
-
-            <div class="report-card">
-                <div class="report-head">
-                    <h3>Chat activity</h3>
-                    <div class="report-actions">
-                        <button type="button" id="downloadReportBtn">Download</button>
-                        <button type="button" id="clearReportBtn" class="ghost-btn">Clear</button>
-                    </div>
-                </div>
-                <ol id="reportList" class="report-list">
-                    <li class="report-empty">No chat activity yet. Ask a question in the AI Assistant tab.</li>
-                </ol>
-            </div>
         </section>
 
 
         <!-- FILE INTELLIGENCE -->
+
         <section id="uploads" class="dashboard-section">
 
             <div class="section-title">
-                <h1>File Intelligence</h1>
-                <p>Upload documents and images for AI analysis.</p>
+                <h2>File Intelligence</h2>
             </div>
 
             <div class="upload-grid">
 
+                <!-- DOCUMENT ANALYSIS -->
+
                 <article class="upload-card">
-                    <h3>Document</h3>
-                    <p>Analyze security documents and reports.</p>
+
+                    <h3>Document Analysis</h3>
 
                     <label for="documentInput" class="upload-dropzone">
-                        <span class="upload-symbol">↑</span>
-                        <strong>Select document</strong>
-                        <small>PDF, TXT, CSV, DOCX · Max 10 MB</small>
+                        <strong>Select Document</strong>
+                        <small>PDF, TXT, CSV, DOCX · Maximum 10 MB</small>
                         <input type="file" id="documentInput" accept=".pdf,.txt,.csv,.docx" hidden>
                     </label>
 
-                    <div id="documentFileInfo" hidden>
+                    <div id="documentFileInfo" class="file-chip" hidden>
                         <span id="documentFileName"></span>
-                        <button type="button" id="removeDocument">Remove</button>
+                        <button type="button" id="removeDocument" class="ghost-btn small-btn">Remove</button>
                     </div>
 
-                    <button type="button" id="analyzeDocumentBtn" disabled>Analyze document</button>
+                    <div>
+                        <button type="button" id="analyzeDocumentBtn" class="primary">Analyze Document</button>
+                    </div>
+
                     <p id="documentStatus"></p>
+
                 </article>
+
+
+                <!-- KNOWLEDGE BASE -->
 
                 <article class="upload-card">
-                    <h3>Image</h3>
-                    <p>Select screenshots, diagrams and security images.</p>
 
-                    <label for="imageInput" class="upload-dropzone">
-                        <span class="upload-symbol">▧</span>
-                        <strong>Select image</strong>
-                        <small>PNG, JPG, JPEG, WEBP · Max 10 MB</small>
-                        <input type="file" id="imageInput" accept=".png,.jpg,.jpeg,.webp" hidden>
-                    </label>
-
-                    <div id="imagePreviewContainer" hidden>
-                        <img id="imagePreview" alt="Selected image preview">
-                        <button type="button" id="removeImage">Remove</button>
+                    <div class="list-head">
+                        <h3>Knowledge Base</h3>
+                        <button type="button" id="refreshKnowledgeBaseBtn" class="ghost-btn small-btn">Refresh Knowledge Base</button>
                     </div>
 
-                    <button type="button" id="analyzeImageBtn" disabled>Analyze image</button>
-                    <p id="imageStatus"></p>
+                    <p id="knowledgeBaseStatus">Loading knowledge base...</p>
+
+                    <div id="knowledgeBaseList"></div>
+
                 </article>
 
             </div>
 
-            <div class="knowledge-base-card">
-                <div class="kb-head">
-                    <div>
-                        <h2>Knowledge Base</h2>
-                        <p>Documents indexed for AI retrieval.</p>
-                    </div>
-                    <button type="button" id="refreshKnowledgeBaseBtn">Refresh</button>
-                </div>
-                <p id="knowledgeBaseStatus">Loading documents...</p>
-                <div id="knowledgeBaseList"></div>
+
+            <!-- DOCUMENT REPORT -->
+
+            <article id="uploadAnalysisOutput" class="result" hidden>
+                <h3 id="uploadAnalysisTitle">Document Analysis Report</h3>
+                <div id="uploadAnalysisContent"></div>
+            </article>
+
+        </section>
+
+
+        <!-- IMAGE ANALYSIS -->
+
+        <section id="image-analysis" class="dashboard-section">
+
+            <div class="section-title">
+                <h2>Image Analysis</h2>
+                <p>Inspect an image: format, hash, metadata and technical findings.</p>
             </div>
 
-            <div id="uploadAnalysisOutput" hidden>
-                <h3 id="uploadAnalysisTitle">Analysis Results</h3>
-                <div id="uploadAnalysisContent"></div>
+            <div class="narrow">
+
+                <label for="imageInput" class="upload-dropzone">
+                    <strong>Select Image</strong>
+                    <small>PNG, JPG, JPEG, WEBP · Maximum 10 MB</small>
+                    <input type="file" id="imageInput" accept=".png,.jpg,.jpeg,.webp" hidden>
+                </label>
+
+                <div id="imagePreviewContainer" hidden>
+                    <img id="imagePreview" alt="Selected image preview">
+                    <button type="button" id="removeImage" class="ghost-btn small-btn">Remove Image</button>
+                </div>
+
+                <div>
+                    <button type="button" id="analyzeImageBtn" class="primary">Analyze Image</button>
+                </div>
+
+                <p id="imageStatus">Select an image to begin.</p>
+
+                <div id="imageAnalysisOutput" class="result" hidden>
+                    <h3 id="imageAnalysisTitle">Image Analysis Report</h3>
+                    <div id="imageAnalysisContent"></div>
+                </div>
+
             </div>
+
+        </section>
+
+
+        <!-- PHISHING LINK ANALYSIS -->
+
+        <section id="phishing-analysis" class="dashboard-section">
+
+            <div class="section-title">
+                <h2>Phishing Link Analysis</h2>
+            </div>
+
+            <form id="phishingUrlForm" class="inline-form">
+
+                <label for="phishingUrlInput">URL</label>
+
+                <input
+                    type="url"
+                    id="phishingUrlInput"
+                    maxlength="2048"
+                    placeholder="https://example.com"
+                    required>
+
+                <button type="submit" id="analyzeUrlBtn" class="primary">Analyze URL</button>
+
+            </form>
+
+            <p id="phishingUrlStatus"></p>
+
+            <div id="phishingAnalysisOutput" class="result" hidden>
+                <h3>URL Assessment</h3>
+                <div id="phishingAnalysisContent"></div>
+            </div>
+
+            <p class="analysis-disclaimer">
+                An automated assessment is not proof that a URL is safe or malicious.
+            </p>
+
+        </section>
+
+
+        <!-- THREAT INTELLIGENCE -->
+
+        <section id="threat-intelligence" class="dashboard-section">
+
+            <div class="section-title">
+                <h2>Threat Intelligence</h2>
+            </div>
+
+            <form id="threatIntelligenceForm" class="inline-form">
+
+                <label for="threatIndicatorInput">Indicator</label>
+
+                <input
+                    type="text"
+                    id="threatIndicatorInput"
+                    maxlength="255"
+                    placeholder="IP address, domain, URL or file hash"
+                    autocomplete="off"
+                    required>
+
+                <button type="submit" id="analyzeThreatIndicatorBtn" class="primary">Assess Indicator</button>
+
+            </form>
+
+            <p id="threatIntelligenceStatus"></p>
+
+            <article id="threatIntelligenceOutput" class="result" hidden>
+                <h3>Assessment Report</h3>
+                <p id="threatIndicatorType"></p>
+                <div id="threatIntelligenceContent"></div>
+            </article>
+
+            <p class="analysis-disclaimer">
+                Assessments can be incomplete or inaccurate. Only review indicators you are authorized to investigate.
+            </p>
 
         </section>
 
 
         <!-- SECURITY LOGS -->
+
         <section id="security-logs" class="dashboard-section">
 
             <div class="section-title">
-                <h1>Security Logs</h1>
-                <p>Create and classify security events.</p>
+                <h2>Security Logs</h2>
             </div>
 
-            <div class="event-form-card">
-                <form id="securityLogForm">
-                    <label for="eventType">Event type</label>
-                    <input type="text" id="eventType" placeholder="Authentication Failure" maxlength="100" required>
+            <form id="securityLogForm" class="log-form">
 
+                <div class="field">
+                    <label for="eventType">Event Type</label>
+                    <input type="text" id="eventType" maxlength="100" placeholder="Authentication Failure" required>
+                </div>
+
+                <div class="field">
                     <label for="eventSeverity">Severity</label>
                     <select id="eventSeverity" required>
                         <option value="">Select severity</option>
@@ -288,73 +424,65 @@
                         <option value="High">High</option>
                         <option value="Critical">Critical</option>
                     </select>
+                </div>
 
+                <div class="field">
                     <label for="eventDescription">Description</label>
-                    <textarea id="eventDescription" placeholder="Describe the security event..." maxlength="5000" required></textarea>
+                    <textarea id="eventDescription" rows="1" maxlength="5000" placeholder="Describe the event..." required></textarea>
+                </div>
 
-                    <button type="submit" id="saveLogBtn">Save event</button>
-                    <p id="logFormStatus"></p>
-                </form>
+                <button type="submit" id="saveLogBtn" class="primary">Save Security Event</button>
+
+                <p id="logFormStatus"></p>
+
+            </form>
+
+            <div class="list-head">
+                <h3>Recent Security Events</h3>
+                <p id="statusMessage">Loading security logs...</p>
             </div>
 
-            <div class="logs-section">
-                <h3>Recent events</h3>
-                <p id="statusMessage">Loading security logs...</p>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Event</th>
-                                <th>Description</th>
-                                <th>Severity</th>
-                                <th>AI Prediction</th>
-                                <th>Confidence</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logsTable"></tbody>
-                    </table>
-                </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Event</th>
+                            <th>Description</th>
+                            <th>Severity</th>
+                            <th>AI Prediction</th>
+                            <th>Confidence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTable"></tbody>
+                </table>
             </div>
 
         </section>
 
 
         <!-- ANALYSIS HISTORY -->
+
         <section id="history" class="dashboard-section">
-            <div class="section-title">
-                <h1>Analysis History</h1>
-                <p>Your previous document analyses and reports.</p>
+
+            <div class="section-title with-actions">
+                <h2>Analysis History</h2>
+                <button type="button" id="refreshHistoryBtn" class="ghost-btn">Refresh History</button>
             </div>
-            <div id="analysisHistory">
-                <p>No analyses yet.</p>
-            </div>
+
+            <p id="historyStatus">Activity will appear here.</p>
+
+            <div id="analysisHistory"></div>
+
         </section>
 
     </main>
 
 </div>
 
+
 <script src="/static/dashboard.js"></script>
 <script src="/static/dashboard-nav.js"></script>
-<script>
-    // Mobile menu (open/close the navigation drawer)
-    (function () {
-        var btn = document.getElementById("menuBtn");
-        var side = document.getElementById("sidebar");
-        var scrim = document.getElementById("scrim");
-        function set(open) {
-            side.classList.toggle("open", open);
-            scrim.hidden = !open;
-            btn.setAttribute("aria-expanded", open ? "true" : "false");
-        }
-        btn.addEventListener("click", function () { set(!side.classList.contains("open")); });
-        scrim.addEventListener("click", function () { set(false); });
-        side.addEventListener("click", function (e) { if (e.target.closest("nav a")) set(false); });
-        document.addEventListener("keydown", function (e) { if (e.key === "Escape") set(false); });
-    })();
-</script>
 
 </body>
 </html>

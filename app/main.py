@@ -10,6 +10,11 @@ from app.classifier import classify_event_with_confidence
 from app.ai.analyzer import CyberMindAnalyzer
 from app.routes.auth import router as auth_router, get_current_user
 from app.routes.chat import router as chat_router
+from app.routes.image_analysis import router as image_router
+from app.routes.file_security import router as file_security_router
+from app.routes.url_analysis import router as url_router
+from app.routes.email_analysis import router as email_router
+from app.routes.threat_intelligence import router as threat_intelligence_router
 
 # ==========================================
 # 1. CREATE FASTAPI APPLICATION
@@ -33,6 +38,12 @@ app.mount(
 app.include_router(auth_router)
 app.include_router(files_router)
 app.include_router(chat_router)
+app.include_router(image_router)
+app.include_router(file_security_router)
+app.include_router(url_router)
+app.include_router(email_router)
+app.include_router(threat_intelligence_router)
+
 # Initialize the local AI analyzer
 analyzer = CyberMindAnalyzer()
 
